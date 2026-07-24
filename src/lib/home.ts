@@ -45,6 +45,15 @@ export interface HomeConfig {
     description?: Localized;
     button?: { label: Localized; href: string; external?: boolean };
   };
+  /** Catalog "Browse" nav link for the cards home. The stacks catalog Browse
+   *  nav anchors into the catalog home's #categories section, so it's hidden on
+   *  a cards home — set this to add a header nav item that points at a separate
+   *  catalog page instead (e.g. a category browse at `/categories/tools/`, or a
+   *  tag/vendor page). `href` is a locale-less internal path (prefixed per
+   *  locale at render) or an external URL (`external: true`); `label` defaults
+   *  to the theme's "Browse" string. Ignored on the catalog home, which keeps
+   *  its built-in #categories Browse. */
+  browse?: { href: string; label?: Localized; external?: boolean };
 }
 
 export const home: HomeConfig | undefined = (site as { home?: HomeConfig }).home;
