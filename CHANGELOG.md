@@ -11,6 +11,19 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [Unreleased]
+
+### Added
+
+- **Cards-home catalog Browse nav** — `home.browse = { href, label?, external? }`:
+  on a cards home the stacks catalog Browse nav is hidden (it anchors into the
+  catalog home's `#categories` section, which a cards home doesn't have). Set
+  `home.browse` to add a header nav item (the same grid icon) that links to a
+  separate catalog page instead — e.g. a category browse at `/categories/tools/`.
+  `href` is a locale-less internal path (prefixed per locale) or an external URL;
+  `label` falls back to the theme's "Browse" string. The catalog home is
+  unaffected — it keeps its built-in `#categories` Browse.
+
 ## [1.21.0] - 2026-07-24
 
 ### Added
