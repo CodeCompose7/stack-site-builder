@@ -11,7 +11,7 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
-## [Unreleased]
+## [1.22.0] - 2026-07-25
 
 ### Added
 
