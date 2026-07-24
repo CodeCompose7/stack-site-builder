@@ -165,7 +165,20 @@ home: {
 
 Localized values are either one string or a per-locale record with
 default-locale fallback. On a cards home the header's Browse link (which
-anchors into the catalog) hides itself.
+anchors into the catalog home's `#categories` section) hides itself — set
+`home.browse` to add it back, pointing at a separate catalog page instead:
+
+```ts
+home: {
+  template: 'cards',
+  // …
+  // Header nav item (grid icon) → a standalone catalog page. Use this when the
+  // catalog lives at a category browse rather than on the home. `href` is a
+  // locale-less internal path (or an external URL with `external: true`);
+  // `label` defaults to the theme's "Browse" string.
+  browse: { href: '/categories/tools/', label: { ko: '사용 도구', en: 'Tools' } },
+},
+```
 
 ## Papers (opt-in)
 

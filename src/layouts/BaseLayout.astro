@@ -12,7 +12,7 @@ import BackToTop from '../components/BackToTop.astro';
 import Footer from '@aas-footer';
 import { getNavPages, pageSlugOf } from '../lib/pages';
 import { getNavProducts, getTopProducts, productSlugOf } from '../lib/products';
-import { homeTemplate } from '../lib/home';
+import { homeTemplate, home as homeConfig, loc } from '../lib/home';
 import { sectionEnabled, type SectionKey } from '../lib/sections';
 import { siteIcons } from '../lib/icons';
 import { privateClientData } from '../lib/private';
@@ -84,6 +84,10 @@ const showRepoLink =
 // layouts never drift: an icon-only row (≥sm) and a labelled dropdown menu
 // (<sm, so a phone header stays to a few controls instead of a long icon run).
 // `svg` is the icon's inner markup (drawn into a shared <svg> shell below).
+// Shared 2×2 grid icon for the catalog Browse nav (catalog home + cards-home
+// `home.browse`).
+const CATALOG_ICON =
+  '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>';
 const allNavItems: {
   href: string;
   label: string;
@@ -92,18 +96,30 @@ const allNavItems: {
   keepFilters?: boolean;
   section?: SectionKey;
 }[] = [
-  // Browse anchors into the catalog home's category sections — it only makes
-  // sense when the site keeps the catalog home template.
+  // Browse (grid icon): on the catalog home it anchors into the #categories
+  // section; on a cards home it's off unless the site sets `home.browse` to
+  // point at a separate catalog page (e.g. a category browse).
   ...(homeTemplate === 'catalog'
     ? [
         {
           href: `${home}#categories`,
           label: t('nav.browse'),
           keepFilters: true,
-          svg: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+          svg: CATALOG_ICON,
         },
       ]
-    : []),
+    : homeConfig?.browse
+      ? [
+          {
+            href: homeConfig.browse.external
+              ? homeConfig.browse.href
+              : getRelativeLocaleUrl(lang, homeConfig.browse.href.replace(/^\//, '')),
+            label: loc(homeConfig.browse.label, lang) ?? t('nav.browse'),
+            external: homeConfig.browse.external,
+            svg: CATALOG_ICON,
+          },
+        ]
+      : []),
   ...(hasProducts
     ? [
         {
