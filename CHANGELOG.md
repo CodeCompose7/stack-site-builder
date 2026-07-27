@@ -11,6 +11,18 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [Unreleased]
+
+### Added
+
+- **Wikilink `course` / `paper` targets** — glossary entries can now point at
+  the opt-in sections' detail pages: `{ label: '…', course: '<slug>' }` links
+  `[[Term]]` to `/course/<slug>/`, `paper: '<id>'` to `/paper/<id>/` (relative,
+  so locale- and base-path-agnostic like the existing stack/concept/article
+  targets). The glossary page lists them under new Courses/Papers sections
+  (flat — no dependency on the sites' opt-in course/paper category data), with
+  graduation-cap / scroll fallback glyphs.
+
 ## [1.22.0] - 2026-07-25
 
 ### Added

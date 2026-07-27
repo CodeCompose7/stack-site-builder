@@ -230,7 +230,8 @@ function remarkSlideDirectives() {
 
 // Turn `[[Term]]` (and `[[Term|display text]]`) wikilinks into links, resolving
 // each against the site's central glossary (passed as an option). Internal targets
-// emit a `../stack|concept/<slug>/` relative form (locale- and base-agnostic), with
+// (stack/concept/article/course/paper) emit a `../<kind>/<slug>/` relative form
+// (locale- and base-agnostic), with
 // the number of `../` set by how deep the source page sits in its locale (see `up`
 // below); external `href` entries pass through and get
 // target="_blank" from rehype-external-links downstream. An unknown term throws,
@@ -344,19 +345,23 @@ function remarkGlossary({ glossary, locales = ['en', 'ko'], defaultLocale = 'en'
                 ? `${up}concept/${entry.concept}/`
                 : entry.article
                   ? `${up}article/${entry.article}/`
-                  : entry.href
-                    ? entry.href
-                    : def
-                      ? `${up}glossary/#${id}`
-                      : null;
+                  : entry.course
+                    ? `${up}course/${entry.course}/`
+                    : entry.paper
+                      ? `${up}paper/${entry.paper}/`
+                      : entry.href
+                        ? entry.href
+                        : def
+                          ? `${up}glossary/#${id}`
+                          : null;
             if (!url)
               throw new Error(
-                `[glossary] term "[[${m[1]}]]" needs one of stack/concept/article/href/def`,
+                `[glossary] term "[[${m[1]}]]" needs one of stack/concept/article/course/paper/href/def`,
               );
             if (anchor) {
               // A def-only target already carries its own hash — an extra
               // anchor is a mistake, so fail the build like an unknown term.
-              if (!entry.stack && !entry.concept && !entry.article && !entry.href)
+              if (!entry.stack && !entry.concept && !entry.article && !entry.course && !entry.paper && !entry.href)
                 throw new Error(
                   `[glossary] "[[${m[1]}]]" — a definition-only term can't take a #anchor`,
                 );
