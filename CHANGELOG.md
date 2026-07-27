@@ -11,6 +11,18 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.23.0] - 2026-07-27
+
+### Added
+
+- **Wikilink `course` / `paper` targets** — glossary entries can now point at
+  the opt-in sections' detail pages: `{ label: '…', course: '<slug>' }` links
+  `[[Term]]` to `/course/<slug>/`, `paper: '<id>'` to `/paper/<id>/` (relative,
+  so locale- and base-path-agnostic like the existing stack/concept/article
+  targets). The glossary page lists them under new Courses/Papers sections
+  (flat — no dependency on the sites' opt-in course/paper category data), with
+  graduation-cap / scroll fallback glyphs.
+
 ## [1.22.0] - 2026-07-25
 
 ### Added
@@ -409,6 +421,7 @@ catalog sites from a thin content-only repository.
 - **Standalone development setup** — a devcontainer and a minimal `playground/`
   consuming site for developing and previewing the theme on its own.
 
+[1.23.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.22.0...v1.23.0
 [1.19.3]: https://github.com/CodeCompose7/stack-site-builder/compare/v1.19.2...v1.19.3
 [1.19.2]: https://github.com/CodeCompose7/stack-site-builder/compare/v1.19.1...v1.19.2
 [1.19.1]: https://github.com/CodeCompose7/stack-site-builder/compare/v1.19.0...v1.19.1

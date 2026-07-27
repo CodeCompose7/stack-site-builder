@@ -19,6 +19,8 @@ type Entry = {
   stack?: string;
   concept?: string;
   article?: string;
+  course?: string;
+  paper?: string;
   href?: string;
   def?: string | { ko: string; en: string };
 };
@@ -54,6 +56,11 @@ const articleBySlug = new Map(articles.map((a) => [articleSlugOf(a), a]));
 const tools: Term[] = [];
 const conceptTerms: Term[] = [];
 const articleTerms: Term[] = [];
+// Courses/papers are opt-in sections whose category data a site may not have,
+// so their terms render as flat groups (no @aas-data/{course,paper}-categories
+// import — that would break sites that don't supply those files).
+const courseTerms: Term[] = [];
+const paperTerms: Term[] = [];
 const defTerms: Term[] = [];
 const external: Term[] = [];
 
@@ -110,6 +117,30 @@ for (const [id, e] of Object.entries(map)) {
       catLabel: top?.label[lang] ?? '',
       search: `${label} ${leaf?.label[lang] ?? ''} ${top?.label[lang] ?? ''}`.toLowerCase(),
     });
+  } else if (e.course) {
+    courseTerms.push({
+      id,
+      label,
+      href: getRelativeLocaleUrl(lang, `course/${e.course}/`),
+      subtitle: def,
+      external: false,
+      icon: { name: label, fallback: 'course' },
+      catId: '',
+      catLabel: '',
+      search: `${label} ${def}`.toLowerCase(),
+    });
+  } else if (e.paper) {
+    paperTerms.push({
+      id,
+      label,
+      href: getRelativeLocaleUrl(lang, `paper/${e.paper}/`),
+      subtitle: def,
+      external: false,
+      icon: { name: label, fallback: 'paper' },
+      catId: '',
+      catLabel: '',
+      search: `${label} ${def}`.toLowerCase(),
+    });
   } else if (e.href) {
     external.push({
       id,
@@ -162,6 +193,8 @@ const kinds = [
   { key: 'tool', title: t('glossary.tool'), groups: groupBy(tools, rootCategories.map((c) => c.id)) },
   { key: 'concept', title: t('glossary.concept'), groups: groupBy(conceptTerms, conceptTree.roots.map((c) => c.id)) },
   { key: 'article', title: t('glossary.article'), groups: groupBy(articleTerms, articleTree.roots.map((c) => c.id)) },
+  { key: 'course', title: t('glossary.course'), groups: flat(courseTerms) },
+  { key: 'paper', title: t('glossary.paper'), groups: flat(paperTerms) },
   { key: 'term', title: t('glossary.term'), groups: flat(defTerms) },
   { key: 'external', title: t('glossary.external'), groups: flat(external) },
 ].filter((k) => k.groups.length > 0);

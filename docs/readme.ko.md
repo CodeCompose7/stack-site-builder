@@ -41,7 +41,7 @@ export const collections = defineAasCollections({ categoryMap });
 | `src/data/site.ts` | 사이트 정체성: 이름, 저장소 URL(`repoNav: false`면 헤더 GitHub 링크 숨김), 제공 `locales`, 선택적 `sections` 토글, 브라우저 아이콘(`icons: { favicon, appleTouch, manifest }`), `home` 템플릿, 로케일별 UI 문자열 오버라이드 |
 | `src/data/categories.ts` | 도구 카탈로그 카테고리 트리 (콘텐츠와 대조 검증됨) |
 | `src/data/concept-categories.ts` · `article-categories.ts` · `course-categories.ts` · `product-categories.ts` · `paper-categories.ts` (옵트인) | 개념 / 글 / 강의 / 제품 / 논문의 분류 체계 |
-| `src/data/glossary.mjs` | `[[용어]]` 위키링크 대상 |
+| `src/data/glossary.mjs` | `[[용어]]` 위키링크 대상 — 각 항목은 `stack` / `concept` / `article` / `course` / `paper` 페이지, 외부 `href`, 또는 정의만 있는 용어(`def`)로 연결된다 |
 | `src/content/{stacks,concepts,courses,products,papers,articles,slides}/` | 콘텐츠 — 로케일당 MDX 파일 하나 |
 | `src/content/pages/` | 독립 최상위 페이지 (예: 소개/About). `/<slug>/`로 렌더되고 헤더 네비에 연결 가능 |
 | `public/` · `samples/` | 로고/파비콘과 실행 가능한 샘플 프로젝트 |
