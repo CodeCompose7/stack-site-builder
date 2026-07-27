@@ -9,6 +9,19 @@ export const glossary = {
     label: 'ComfyUI',
     stack: 'comfyui',
   },
+  'agents-course': {
+    label: { ko: 'AI 에이전트 입문 강의', en: 'Getting Started with AI Agents' },
+    course: 'getting-started-with-agents',
+  },
+  'attention-paper': {
+    label: { ko: '어텐션 논문', en: 'the Attention paper' },
+    paper: 'attention-is-all-you-need',
+    def: {
+      ko: '트랜스포머를 제안한 2017년 논문 「Attention Is All You Need」.',
+      en: 'The 2017 paper "Attention Is All You Need" that introduced the Transformer.',
+      ja: 'トランスフォーマーを提案した2017年の論文「Attention Is All You Need」。',
+    },
+  },
   diffusion: {
     label: { ko: '디퓨전 모델', en: 'Diffusion model', ja: '拡散モデル' },
     def: {

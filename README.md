@@ -39,7 +39,7 @@ export const collections = defineAasCollections({ categoryMap });
 | `src/data/site.ts` | Site identity: name, repo URL (`repoNav: false` hides the header's GitHub link), the `locales` it ships, optional `sections` toggles, browser icons (`icons: { favicon, appleTouch, manifest }`), the `home` template, per-locale UI string overrides |
 | `src/data/categories.ts` | The tool-catalog category tree (validated against content) |
 | `src/data/concept-categories.ts` · `article-categories.ts` · `course-categories.ts` · `product-categories.ts` · `paper-categories.ts` (opt-in) | Taxonomies for concepts / articles / courses / products / papers |
-| `src/data/glossary.mjs` | `[[Term]]` wikilink targets |
+| `src/data/glossary.mjs` | `[[Term]]` wikilink targets — each entry links a term to a `stack` / `concept` / `article` / `course` / `paper` page, an external `href`, or is a definition-only term (`def`) |
 | `src/content/{stacks,concepts,courses,products,papers,articles,slides}/` | The content, one MDX file per locale |
 | `src/content/pages/` | Standalone top-level pages (e.g. an About/소개), rendered at `/<slug>/` and optionally linked in the header nav |
 | `public/` · `samples/` | Logos/favicons and runnable sample projects |
