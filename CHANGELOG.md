@@ -11,7 +11,7 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
-## [Unreleased]
+## [1.23.1] - 2026-07-29
 
 ### Fixed
 
@@ -433,6 +433,7 @@ catalog sites from a thin content-only repository.
 - **Standalone development setup** — a devcontainer and a minimal `playground/`
   consuming site for developing and previewing the theme on its own.
 
+[1.23.1]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.0...v1.23.1
 [1.23.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.22.0...v1.23.0
 [1.19.3]: https://github.com/CodeCompose7/stack-site-builder/compare/v1.19.2...v1.19.3
 [1.19.2]: https://github.com/CodeCompose7/stack-site-builder/compare/v1.19.1...v1.19.2
