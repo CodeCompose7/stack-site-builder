@@ -581,6 +581,24 @@ summary {
   list-style: decimal;
   padding-left: 1.25rem;
 }
+/* Blockquotes — a quiet left-accent rail with a faint neutral fill, so a
+   pulled-out passage reads as set apart from the running text. No italic: it
+   renders on Korean prose too, where slanted CJK looks wrong. First/last child
+   margins collapse so the quote hugs its own padding. */
+.prose :where(blockquote) {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1.15rem;
+  border-left: 3px solid var(--aas-accent);
+  border-radius: 0 0.5rem 0.5rem 0;
+  background: var(--aas-tint);
+  color: color-mix(in srgb, var(--aas-text) 88%, transparent);
+}
+.prose :where(blockquote > :first-child) {
+  margin-top: 0;
+}
+.prose :where(blockquote > :last-child) {
+  margin-bottom: 0;
+}
 .prose :where(a) {
   color: var(--aas-accent);
   text-decoration: none;
