@@ -11,6 +11,18 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.23.1] - 2026-07-29
+
+### Fixed
+
+- **Prose blockquote styling** — `>` blockquotes in reading content (courses,
+  articles, concepts, stacks and standalone pages) rendered with the browser
+  default and were nearly indistinguishable from a normal paragraph. They now
+  get a left accent rail and a faint neutral fill so a pulled-out passage reads
+  as set apart. Light/dark-aware (theme tokens), and no italic so it renders
+  cleanly on Korean prose. Two-trailing-space hard breaks inside the quote are
+  preserved as before.
+
 ## [1.23.0] - 2026-07-27
 
 ### Added
@@ -421,6 +433,7 @@ catalog sites from a thin content-only repository.
 - **Standalone development setup** — a devcontainer and a minimal `playground/`
   consuming site for developing and previewing the theme on its own.
 
+[1.23.1]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.0...v1.23.1
 [1.23.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.22.0...v1.23.0
 [1.19.3]: https://github.com/CodeCompose7/stack-site-builder/compare/v1.19.2...v1.19.3
 [1.19.2]: https://github.com/CodeCompose7/stack-site-builder/compare/v1.19.1...v1.19.2
