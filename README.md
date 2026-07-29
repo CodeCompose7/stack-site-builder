@@ -202,6 +202,9 @@ import Bookmark from 'stack-site-builder/components/Bookmark.astro';
 <Bookmark url="https://…" title="…" description="…" />
 ```
 
+Markdown/MDX authoring gotchas (nested-list indentation, blockquotes, hard
+breaks, wikilinks): `docs/content-authoring.md`.
+
 ## RSS
 
 The articles collection feeds `/rss.xml` (default locale) and

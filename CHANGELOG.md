@@ -11,6 +11,18 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [Unreleased]
+
+### Fixed
+
+- **Prose blockquote styling** — `>` blockquotes in reading content (courses,
+  articles, concepts, stacks and standalone pages) rendered with the browser
+  default and were nearly indistinguishable from a normal paragraph. They now
+  get a left accent rail and a faint neutral fill so a pulled-out passage reads
+  as set apart. Light/dark-aware (theme tokens), and no italic so it renders
+  cleanly on Korean prose. Two-trailing-space hard breaks inside the quote are
+  preserved as before.
+
 ## [1.23.0] - 2026-07-27
 
 ### Added
