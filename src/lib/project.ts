@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { createHighlighter, type Highlighter } from 'shiki';
 import MarkdownIt from 'markdown-it';
+import { withTableScroll } from './md-tables';
 import { site } from '@aas-data/site';
 
 const SAMPLES_DIR = 'samples';
@@ -240,17 +241,19 @@ export async function renderProjects(folders: string[], lang: string): Promise<R
   const hl = await getHighlighter();
   const escapeHtml = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const md = new MarkdownIt({
-    html: false,
-    linkify: true,
-    highlight: (code, info) => {
-      const lang = (info || '').trim() || 'text';
-      // Hand mermaid blocks to the client-side MermaidLoader instead of Shiki,
-      // so README diagrams render as graphics rather than highlighted text.
-      if (lang === 'mermaid') return `<pre class="mermaid">${escapeHtml(code)}</pre>`;
-      return highlight(hl, code, lang);
-    },
-  });
+  const md = withTableScroll(
+    new MarkdownIt({
+      html: false,
+      linkify: true,
+      highlight: (code, info) => {
+        const lang = (info || '').trim() || 'text';
+        // Hand mermaid blocks to the client-side MermaidLoader instead of Shiki,
+        // so README diagrams render as graphics rather than highlighted text.
+        if (lang === 'mermaid') return `<pre class="mermaid">${escapeHtml(code)}</pre>`;
+        return highlight(hl, code, lang);
+      },
+    }),
+  );
   // README links open in a new tab.
   const baseLink = md.renderer.rules.link_open ?? ((t, i, o, _e, s) => s.renderToken(t, i, o));
   md.renderer.rules.link_open = (tokens, idx, opts, env, self) => {

@@ -1,7 +1,8 @@
 import { codeToHtml } from 'shiki';
 import MarkdownIt from 'markdown-it';
+import { withTableScroll } from './md-tables';
 
-const md = new MarkdownIt({ html: false, linkify: true });
+const md = withTableScroll(new MarkdownIt({ html: false, linkify: true }));
 
 export interface SampleHeading {
   slug: string;
