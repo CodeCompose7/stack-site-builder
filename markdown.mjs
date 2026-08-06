@@ -94,6 +94,32 @@ function remarkMermaid() {
   return (/** @type {any} */ tree) => walk(tree);
 }
 
+// Wrap every table in a horizontal scroll box. A table can't scroll itself: the
+// moment it needs `display: table` for real column sizing (and a rounded frame),
+// `overflow-x` on the table is dead, so a table wider than its column has no way
+// out but to squeeze every cell into a stack of wrapped lines — a 120px-tall
+// table becomes 430px of cramped text. The wrapper takes the scrolling, the
+// table keeps its natural widths (see `.aas-table-scroll` in global.css).
+function rehypeTableScroll() {
+  /** @param {any} node */
+  const walk = (node) => {
+    if (!node.children) return;
+    node.children.forEach((/** @type {any} */ child, /** @type {number} */ i) => {
+      if (child.type === 'element' && child.tagName === 'table') {
+        node.children[i] = {
+          type: 'element',
+          tagName: 'div',
+          properties: { className: ['aas-table-scroll'] },
+          children: [child],
+        };
+      } else {
+        walk(child);
+      }
+    });
+  };
+  return (/** @type {any} */ tree) => walk(tree);
+}
+
 // Slide directives (needs remarkDirective, which runs first). Two are handled:
 //
 //   :::cols          columns, separated by `---`:
@@ -405,6 +431,7 @@ export function aasMarkdown({ glossary, locales = ['en', 'ko'], defaultLocale = 
     rehypePlugins: [
       rehypeSlug,
       rehypeHeadingAnchors,
+      rehypeTableScroll,
       [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
     ],
   };

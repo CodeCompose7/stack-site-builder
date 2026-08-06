@@ -72,6 +72,21 @@ Two trailing spaces at the end of a line produce a `<br>` (a hard break) without
 starting a new paragraph — the usual CommonMark rule, and it works inside
 blockquotes too. A blank line still starts a new paragraph.
 
+## Tables
+
+A GFM pipe table renders inside a horizontal scroll box, so a table too wide for
+its column slides sideways rather than wrapping every cell into a stack of lines.
+Nothing to author — the wrapper is added by the pipeline (`rehypeTableScroll` in
+`markdown.mjs` for collection bodies, `withTableScroll` in `src/lib/md-tables.ts`
+for READMEs and sample descriptions) — but it means **wide is fine**: a column
+holding a code sample or a long path keeps it on one line instead of breaking it
+mid-token. In reading content a table narrower than the column keeps its own
+width and centers, so short tables don't get stretched.
+
+The one case that falls back to the old behavior is a raw `<table>` written as
+HTML in an `.mdx` body: it never passes through the wrapper, so it scrolls as a
+block-level element and its columns collapse to fit. Prefer pipe tables.
+
 ## Wikilinks
 
 `[[Term]]` resolves against the site's `src/data/glossary.mjs`; see the glossary

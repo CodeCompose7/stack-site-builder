@@ -379,8 +379,9 @@ html[lang='ko'] h1 {
 }
 /* Doc tables: a touch larger, centered (shrink-to-content), roomier cells, and
    a full-row hover highlight. `fit-content` + `margin-inline: auto` centers the
-   table block while `max-width`/overflow (from the base .prose rule) keep it
-   scrollable if it ever outgrows the column. */
+   table block. When the table sits in a `.aas-table-scroll` wrapper (the normal
+   case — see below) the centering moves to the wrapper and the table keeps its
+   natural column widths instead. */
 .aas-reading.aas-reading :where(table) {
   display: table;
   width: fit-content;
@@ -727,6 +728,18 @@ summary {
   margin-inline: auto;
 }
 
+/* Mermaid draws its labels as real HTML inside <foreignObject> and sizes nodes
+   and subgraph frames from the measured box. Mermaid 11 wraps label text in a
+   <p>, which then inherits the PAGE's paragraph typography — on a slide that is
+   26px/41px, while mermaid only reserves ~25px for a subgraph title, so every
+   subgraph title overlapped the first node inside it by ~16px. Pin label
+   typography back to mermaid's own so its measurements hold. */
+.mermaid foreignObject p {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
 /* Mermaid theme: rounded corners + soft pastel fills, derived from the site
    accent so it adapts to light/dark. `!important` overrides Mermaid's own
    id-scoped <style> block. Applies wherever a diagram renders (prose + samples). */
@@ -794,7 +807,10 @@ summary {
 }
 
 
-/* Markdown tables — without these, columns collapse together. */
+/* Markdown tables — without these, columns collapse together. This is also the
+   fallback for a table that reaches the page WITHOUT the scroll wrapper below
+   (raw HTML in MDX, say): `display: block` + `overflow-x` at least keeps it
+   from pushing the page sideways. */
 .prose :where(table) {
   width: 100%;
   border-collapse: collapse;
@@ -802,6 +818,39 @@ summary {
   font-size: 0.92rem;
   display: block;
   overflow-x: auto;
+}
+
+/* Horizontal scroll box wrapped around every rendered table — by
+   `rehypeTableScroll` (markdown.mjs) for content collections, and by
+   `withTableScroll` (lib/md-tables.ts) for READMEs and sample descriptions.
+   A table cannot scroll itself: it needs `display: table` for real column
+   sizing, which makes `overflow-x` on the table a no-op, so a table wider than
+   its column had no escape but to wrap every cell — a 120px-tall table became
+   430px of cramped text. The wrapper takes the scrolling; the table gets its
+   natural column widths back (`max-content`, floored at the column width so a
+   narrow table still fills it). */
+.aas-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  margin: 1.25rem 0;
+}
+.aas-table-scroll > table {
+  display: table;
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+}
+/* In a reading column the wrapper shrinks to the table and centers, so a table
+   narrower than the column keeps its own width rather than being stretched. */
+.aas-reading.aas-reading .aas-table-scroll {
+  width: fit-content;
+  margin-inline: auto;
+}
+.aas-reading.aas-reading .aas-table-scroll > table {
+  min-width: 0;
+  max-width: none;
+  margin-inline: 0;
 }
 .prose :where(th, td) {
   border: 1px solid var(--aas-border);
@@ -1271,12 +1320,24 @@ summary {
   color: var(--aas-muted);
 }
 
-/* Tables */
+/* Tables. Same deal as prose tables: the `.aas-table-scroll` wrapper does the
+   scrolling, so a wide table slides sideways instead of cramming its cells. */
+.aas-slide-inner .aas-table-scroll {
+  width: 100%;
+  margin: 0.5em 0;
+}
 .aas-slide-inner table {
   width: 100%;
   border-collapse: collapse;
   font-size: clamp(0.9rem, 1.5vw, 1.25rem);
   margin: 0.5em 0;
+}
+/* Declared after `.aas-slide-inner table` so the wrapped form wins: full column
+   width normally, natural width (scrolling) once the table outgrows the slide. */
+.aas-slide-inner .aas-table-scroll > table {
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
 }
 .aas-slide-inner th,
 .aas-slide-inner td {
@@ -1527,6 +1588,38 @@ summary {
 }
 /* 3b) Code stays pinned to the top of its filled box — that's the default block
        flow of a tall <pre>, so nothing extra is needed. */
+
+/* 3c) Size the diagram against the box it was just given, not a fixed viewport
+       fraction. The generic caps (`pre` 62vh, svg 52vh) don't know how much room
+       the fill rules actually handed over — on a full-height slide that box is
+       ~78vh, so a tall flowchart rendered at a THIRD of its size with the unused
+       height letterboxed as empty margins either side. The box already has a
+       definite height here, so `100%` resolves against it; the svg's viewBox
+       does the rest (it scales to fit and centers itself). Excludes the layouts
+       that deliberately manage their own overflow: `compact` (natural size),
+       `.aas-split.scroll` (vertical scroll box) and `scroll-x` (horizontal). */
+.aas-slide:not(.compact):not(.scroll-x) .aas-slide-inner > .aas-diagram > pre.mermaid,
+.aas-slide:not(.compact):not(.scroll-x)
+  .aas-slide-inner
+  > .aas-split:not(.scroll)
+  > .aas-diagram
+  > pre.mermaid {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 100%;
+  width: 100%;
+}
+.aas-slide:not(.compact):not(.scroll-x) .aas-slide-inner > .aas-diagram > pre.mermaid > svg,
+.aas-slide:not(.compact):not(.scroll-x)
+  .aas-slide-inner
+  > .aas-split:not(.scroll)
+  > .aas-diagram
+  > pre.mermaid
+  > svg {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
 
 /* Scrollable diagram (`<div class="aas-split scroll">`): the diagram column is a
    fixed-height scroll box (opted out of the fill rules above) and the diagram
