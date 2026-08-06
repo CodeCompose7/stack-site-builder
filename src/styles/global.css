@@ -727,6 +727,18 @@ summary {
   margin-inline: auto;
 }
 
+/* Mermaid draws its labels as real HTML inside <foreignObject> and sizes nodes
+   and subgraph frames from the measured box. Mermaid 11 wraps label text in a
+   <p>, which then inherits the PAGE's paragraph typography — on a slide that is
+   26px/41px, while mermaid only reserves ~25px for a subgraph title, so every
+   subgraph title overlapped the first node inside it by ~16px. Pin label
+   typography back to mermaid's own so its measurements hold. */
+.mermaid foreignObject p {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
 /* Mermaid theme: rounded corners + soft pastel fills, derived from the site
    accent so it adapts to light/dark. `!important` overrides Mermaid's own
    id-scoped <style> block. Applies wherever a diagram renders (prose + samples). */
@@ -1527,6 +1539,38 @@ summary {
 }
 /* 3b) Code stays pinned to the top of its filled box — that's the default block
        flow of a tall <pre>, so nothing extra is needed. */
+
+/* 3c) Size the diagram against the box it was just given, not a fixed viewport
+       fraction. The generic caps (`pre` 62vh, svg 52vh) don't know how much room
+       the fill rules actually handed over — on a full-height slide that box is
+       ~78vh, so a tall flowchart rendered at a THIRD of its size with the unused
+       height letterboxed as empty margins either side. The box already has a
+       definite height here, so `100%` resolves against it; the svg's viewBox
+       does the rest (it scales to fit and centers itself). Excludes the layouts
+       that deliberately manage their own overflow: `compact` (natural size),
+       `.aas-split.scroll` (vertical scroll box) and `scroll-x` (horizontal). */
+.aas-slide:not(.compact):not(.scroll-x) .aas-slide-inner > .aas-diagram > pre.mermaid,
+.aas-slide:not(.compact):not(.scroll-x)
+  .aas-slide-inner
+  > .aas-split:not(.scroll)
+  > .aas-diagram
+  > pre.mermaid {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 100%;
+  width: 100%;
+}
+.aas-slide:not(.compact):not(.scroll-x) .aas-slide-inner > .aas-diagram > pre.mermaid > svg,
+.aas-slide:not(.compact):not(.scroll-x)
+  .aas-slide-inner
+  > .aas-split:not(.scroll)
+  > .aas-diagram
+  > pre.mermaid
+  > svg {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
 
 /* Scrollable diagram (`<div class="aas-split scroll">`): the diagram column is a
    fixed-height scroll box (opted out of the fill rules above) and the diagram
