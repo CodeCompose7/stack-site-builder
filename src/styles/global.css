@@ -379,8 +379,9 @@ html[lang='ko'] h1 {
 }
 /* Doc tables: a touch larger, centered (shrink-to-content), roomier cells, and
    a full-row hover highlight. `fit-content` + `margin-inline: auto` centers the
-   table block while `max-width`/overflow (from the base .prose rule) keep it
-   scrollable if it ever outgrows the column. */
+   table block. When the table sits in a `.aas-table-scroll` wrapper (the normal
+   case — see below) the centering moves to the wrapper and the table keeps its
+   natural column widths instead. */
 .aas-reading.aas-reading :where(table) {
   display: table;
   width: fit-content;
@@ -806,7 +807,10 @@ summary {
 }
 
 
-/* Markdown tables — without these, columns collapse together. */
+/* Markdown tables — without these, columns collapse together. This is also the
+   fallback for a table that reaches the page WITHOUT the scroll wrapper below
+   (raw HTML in MDX, say): `display: block` + `overflow-x` at least keeps it
+   from pushing the page sideways. */
 .prose :where(table) {
   width: 100%;
   border-collapse: collapse;
@@ -814,6 +818,39 @@ summary {
   font-size: 0.92rem;
   display: block;
   overflow-x: auto;
+}
+
+/* Horizontal scroll box wrapped around every rendered table — by
+   `rehypeTableScroll` (markdown.mjs) for content collections, and by
+   `withTableScroll` (lib/md-tables.ts) for READMEs and sample descriptions.
+   A table cannot scroll itself: it needs `display: table` for real column
+   sizing, which makes `overflow-x` on the table a no-op, so a table wider than
+   its column had no escape but to wrap every cell — a 120px-tall table became
+   430px of cramped text. The wrapper takes the scrolling; the table gets its
+   natural column widths back (`max-content`, floored at the column width so a
+   narrow table still fills it). */
+.aas-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  margin: 1.25rem 0;
+}
+.aas-table-scroll > table {
+  display: table;
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+}
+/* In a reading column the wrapper shrinks to the table and centers, so a table
+   narrower than the column keeps its own width rather than being stretched. */
+.aas-reading.aas-reading .aas-table-scroll {
+  width: fit-content;
+  margin-inline: auto;
+}
+.aas-reading.aas-reading .aas-table-scroll > table {
+  min-width: 0;
+  max-width: none;
+  margin-inline: 0;
 }
 .prose :where(th, td) {
   border: 1px solid var(--aas-border);
@@ -1283,12 +1320,24 @@ summary {
   color: var(--aas-muted);
 }
 
-/* Tables */
+/* Tables. Same deal as prose tables: the `.aas-table-scroll` wrapper does the
+   scrolling, so a wide table slides sideways instead of cramming its cells. */
+.aas-slide-inner .aas-table-scroll {
+  width: 100%;
+  margin: 0.5em 0;
+}
 .aas-slide-inner table {
   width: 100%;
   border-collapse: collapse;
   font-size: clamp(0.9rem, 1.5vw, 1.25rem);
   margin: 0.5em 0;
+}
+/* Declared after `.aas-slide-inner table` so the wrapped form wins: full column
+   width normally, natural width (scrolling) once the table outgrows the slide. */
+.aas-slide-inner .aas-table-scroll > table {
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
 }
 .aas-slide-inner th,
 .aas-slide-inner td {
