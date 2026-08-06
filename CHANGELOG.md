@@ -11,6 +11,38 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.23.2] - 2026-08-06
+
+### Fixed
+
+- **Wide tables scroll instead of cramming their cells** — a table wider than its
+  column had no way out: it needs `display: table` for real column sizing, which
+  makes `overflow-x` on the table itself a no-op, so every cell was squeezed into
+  a stack of wrapped lines (a 3-column table with 1561px of natural content
+  rendered 920px wide and 3.6x its natural height, breaking code samples
+  mid-token). Every rendered table now sits in a `.aas-table-scroll` box that
+  takes the scrolling while the table keeps its natural widths — on both render
+  paths: `rehypeTableScroll` for content collections, `withTableScroll`
+  (`lib/md-tables.ts`) for the MarkdownIt paths behind READMEs and sample
+  descriptions. In a reading column the wrapper shrinks to the table and centers,
+  so a narrow table keeps its own width instead of being stretched; on slides a
+  wide table slides sideways. A table that arrives without a wrapper (raw HTML in
+  MDX, say) still behaves exactly as before.
+- **Slide diagrams render full-size** — the generic caps (`pre` 62vh, svg 52vh)
+  don't know how much room the slide fill rules actually handed the diagram — on
+  a full-height slide that box is ~78vh — so a tall flowchart was scaled to fit
+  52vh and the unused width was letterboxed as empty margins either side.
+  Diagrams now size against the box they were given (measured on a 1958x2000
+  flowchart: 0.34 -> 0.75 scale). `compact`, `.aas-split.scroll` and `scroll-x`
+  manage their own overflow and are excluded, so they render exactly as before.
+- **Mermaid subgraph titles stop overlapping** — mermaid draws labels as real
+  HTML in a `<foreignObject>` and sizes nodes and cluster frames from the
+  measured box; mermaid 11 wraps label text in a `<p>`, which inherited the
+  page's paragraph typography (26px/41px on a slide) while mermaid reserves only
+  ~25px for a cluster title, so every subgraph title overlapped the first node
+  inside it by ~16px. Label typography is pinned back to mermaid's own so its
+  measurements hold.
+
 ## [1.23.1] - 2026-07-29
 
 ### Fixed
@@ -433,6 +465,7 @@ catalog sites from a thin content-only repository.
 - **Standalone development setup** — a devcontainer and a minimal `playground/`
   consuming site for developing and previewing the theme on its own.
 
+[1.23.2]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.1...v1.23.2
 [1.23.1]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.0...v1.23.1
 [1.23.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.22.0...v1.23.0
 [1.19.3]: https://github.com/CodeCompose7/stack-site-builder/compare/v1.19.2...v1.19.3
