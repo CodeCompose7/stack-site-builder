@@ -11,6 +11,61 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.24.0] - 2026-08-25
+
+Adding a locale was already meant to be site config only — the README said so —
+but four strings never got the memo, so a site shipping a language beyond the
+theme's en/ko had no way to translate its pricing chips, difficulty tooltips or
+license labels, and no way to give the site itself a per-language name. This
+release closes those, along with two hardcodings that assumed the default locale
+is `en` and that a locale code is two bare letters.
+
+### Added
+
+- **Sites supply the enum label tables** — `site.pricingLabels` (the `pricing`
+  frontmatter enum), `site.difficultyLabels` (course `level` 1–5) and
+  `site.licenseLabels` (descriptive licenses like `proprietary`) now feed
+  `pricingLabel()` / `difficultyLabel()` / `licenseLabel()` with the same
+  precedence `useTranslations` already used: the site's table for this locale,
+  the theme's, then both again for the default locale. Each is
+  `{ <code>: { <key>: <label> } }`, merged per key, so a site lists only what it
+  needs — and a site can retranslate a locale the theme ships, since the site's
+  entry wins. Previously these three read en/ko literals with no override point,
+  which left a third locale's chips and tooltips rendering in the default
+  locale's language with nothing a site could do about it.
+- **`site.name` can be per-locale** — either one string for every locale (as
+  before, unchanged) or a record like
+  `{ en: 'Advanced Algorithms', ko: '고급 알고리즘' }`, resolved through the new
+  `siteName(lang)` export and falling back to the default locale then any entry.
+  Every place the name appears — page titles, the header wordmark and its
+  aria-label, the RSS channel title, the catalog and cards homepages, the deck
+  view — now goes through it.
+
+### Fixed
+
+- **The language auto-detect redirect works on non-`en`-default sites** — the
+  root home gated its redirect script on `lang === 'en'` instead of
+  `lang === defaultLang`, so a site whose first locale is anything else (a
+  ko-default lecture site, say) shipped the script on no page at all and never
+  auto-detected. The redirect now lands on whichever locale's home is served
+  without a prefix.
+- **Locale codes that aren't two bare letters** — every collection derived its
+  slugs with a copy of `/^[a-z]{2}\//` and filtered its listings with
+  `id.startsWith(`${lang}/`)`, so a `zh-CN` or `pt-BR` locale produced slugs
+  with the locale still glued on and listings that matched nothing. Both now go
+  through `stripLocale()` / `inLocale()` in `lib/locales.ts`, built from the
+  site's own locale codes. The prefix is compared lowercased because Astro's
+  glob loader lowercases every path segment when it derives content ids, so the
+  content folder may be cased either way (`stacks/zh-CN/` or `stacks/zh-cn/`).
+
+### Changed
+
+- **The playground demos a fourth locale, `zh-CN`** — deliberately a code that
+  is neither two letters nor all-lowercase, with its own `pricingLabels`,
+  `difficultyLabels`, `licenseLabels`, a per-locale `site.name` and a partial
+  `site.ui` table, so the fallbacks and the slug derivation stay covered by the
+  build.
+
 ## [1.23.2] - 2026-08-06
 
 ### Fixed
@@ -465,6 +520,7 @@ catalog sites from a thin content-only repository.
 - **Standalone development setup** — a devcontainer and a minimal `playground/`
   consuming site for developing and previewing the theme on its own.
 
+[1.24.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.2...v1.24.0
 [1.23.2]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.1...v1.23.2
 [1.23.1]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.0...v1.23.1
 [1.23.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.22.0...v1.23.0
