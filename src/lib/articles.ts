@@ -1,18 +1,19 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Lang } from '../i18n/ui';
+import { inLocale, stripLocale } from './locales';
 
 export type ArticleEntry = CollectionEntry<'articles'>;
 
 /** The url slug of an article, i.e. its id with the `<lang>/` prefix removed. */
 export function articleSlugOf(entry: ArticleEntry): string {
-  return entry.id.replace(/^[a-z]{2}\//, '');
+  return stripLocale(entry.id);
 }
 
 /** Published articles for one locale, newest first. */
 export async function getArticles(lang: Lang): Promise<ArticleEntry[]> {
   const all = await getCollection('articles');
   return all
-    .filter((e) => e.id.startsWith(`${lang}/`) && !e.data.draft)
+    .filter((e) => inLocale(e.id, lang) && !e.data.draft)
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 

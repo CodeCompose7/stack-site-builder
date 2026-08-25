@@ -1,11 +1,11 @@
 ---
-import { site } from '@aas-data/site';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ArticleDetail from '../../../components/ArticleDetail.astro';
 import PrivateGate from '../../../components/PrivateGate.astro';
 import { getArticles, articleSlugOf } from '../../../lib/articles';
 import { allLocales, langParam } from '../../../lib/locales';
+import { siteName } from '../../../i18n/ui';
 
 export const getStaticPaths = (async () => {
   const paths: Awaited<ReturnType<GetStaticPaths>> = [];
@@ -23,7 +23,7 @@ const priv = entry.data.private;
 ---
 
 <BaseLayout
-  title={`${entry.data.title} — ${site.name}`}
+  title={`${entry.data.title} — ${siteName(lang)}`}
   description={priv ? entry.data.teaser : entry.data.description}
   lang={lang}
   path={`article/${slug}/`}

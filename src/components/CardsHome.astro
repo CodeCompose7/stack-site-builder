@@ -6,7 +6,7 @@
 import { site } from '@aas-data/site';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { home, loc, locList } from '../lib/home';
-import { useTranslations, type Lang } from '../i18n/ui';
+import { useTranslations, siteName, type Lang } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
@@ -18,7 +18,7 @@ const h = home;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const withBase = (p?: string) => (p && p.startsWith('/') ? base + p : p);
 
-const heroTitle = loc(h?.hero?.title, lang) ?? site.name;
+const heroTitle = loc(h?.hero?.title, lang) ?? siteName(lang);
 const heroSubtitle = loc(h?.hero?.subtitle, lang) ?? t('site.tagline');
 const extAttrs = (external?: boolean) =>
   external ? { target: '_blank', rel: 'noopener noreferrer' } : {};

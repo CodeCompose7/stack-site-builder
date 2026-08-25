@@ -25,9 +25,23 @@ const themeLocales: LocaleDef[] = [
   { code: 'en', label: 'English', dateLocale: 'en-US' },
   { code: 'ko', label: '한국어', dateLocale: 'ko-KR' },
 ];
-// Read defensively: a site that hasn't opted into custom locales simply has no
-// `locales` field, and should keep the theme's en/ko default (not a type error).
-const siteLocales = (site as { locales?: LocaleDef[] }).locales;
+/** A per-locale label table: `{ <locale>: { <key>: <label> } }`. Sites supply
+ *  these for locales the theme doesn't ship (see {@link pricingLabels}). */
+export type LabelTable = Record<string, Record<string, string>>;
+
+// Read defensively: every field below is optional, and a site that declares
+// none of them must not be a type error — the `@aas-data/site` alias points at
+// the site's own object, whose exact shape the theme can't know.
+const siteCfg = site as {
+  name?: string | Record<string, string>;
+  locales?: LocaleDef[];
+  pricingLabels?: LabelTable;
+  difficultyLabels?: LabelTable;
+  licenseLabels?: LabelTable;
+};
+// A site that hasn't opted into custom locales simply has no `locales` field,
+// and should keep the theme's en/ko default.
+const siteLocales = siteCfg.locales;
 const localeList: LocaleDef[] =
   Array.isArray(siteLocales) && siteLocales.length ? siteLocales : themeLocales;
 
@@ -49,6 +63,20 @@ export function dateLocaleOf(lang: Lang): string {
     localeList.find((l) => l.code === defaultLang)?.dateLocale ??
     lang
   );
+}
+
+/**
+ * The site's name in `lang`. `site.name` is either one string used for every
+ * locale (the common case) or a per-locale record — `{ ko: '고급 알고리즘', en:
+ * 'Advanced Algorithms' }` — which falls back to the default locale, then to
+ * any entry. Same rule as `loc()` in lib/home.ts, inlined here because that
+ * module imports this one.
+ */
+export function siteName(lang: Lang): string {
+  const n = siteCfg.name;
+  if (n == null) return '';
+  if (typeof n === 'string') return n;
+  return n[lang] ?? n[defaultLang] ?? Object.values(n)[0] ?? '';
 }
 
 /** UI chrome strings, keyed by a dotted id. */
@@ -436,14 +464,35 @@ export function useTranslations(lang: Lang) {
   };
 }
 
+/**
+ * Look one label up with the same precedence `useTranslations` uses: the site's
+ * table for this locale, the theme's, then both again for the default locale.
+ * The site-first order lets a site retranslate a locale the theme ships; the
+ * default-locale fallback keeps a site-added locale from rendering a bare key.
+ */
+function lookupLabel(
+  siteTable: LabelTable | undefined,
+  themeTable: LabelTable,
+  lang: Lang,
+  key: string,
+): string | undefined {
+  return (
+    siteTable?.[lang]?.[key] ??
+    themeTable[lang]?.[key] ??
+    siteTable?.[defaultLang]?.[key] ??
+    themeTable[defaultLang]?.[key]
+  );
+}
+
 /** Localized label for a `pricing` enum value, falling back to the default
  *  locale then the raw value (so a site-added locale never crashes). */
 export function pricingLabel(lang: Lang, value: string): string {
-  return pricingLabels[lang]?.[value] ?? pricingLabels[defaultLang]?.[value] ?? value;
+  return lookupLabel(siteCfg.pricingLabels, pricingLabels, lang, value) ?? value;
 }
 
-/** Human labels for the `pricing` frontmatter enum, per locale. */
-export const pricingLabels: Record<string, Record<string, string>> = {
+/** Human labels for the `pricing` frontmatter enum, per locale. A site adds its
+ *  own locales via `site.pricingLabels` — same shape, merged per-key. */
+export const pricingLabels: LabelTable = {
   en: {
     'completely-free': 'Completely free',
     'open-source': 'Open source',
@@ -464,20 +513,22 @@ export const pricingLabels: Record<string, Record<string, string>> = {
  *  locale then the bare number (so a site-added locale never crashes). */
 export function difficultyLabel(lang: Lang, level: number): string {
   const key = String(level);
-  return difficultyLabels[lang]?.[key] ?? difficultyLabels[defaultLang]?.[key] ?? key;
+  return lookupLabel(siteCfg.difficultyLabels, difficultyLabels, lang, key) ?? key;
 }
 
-/** Human labels for the course `level` frontmatter (1–5), per locale. */
-export const difficultyLabels: Record<string, Record<string, string>> = {
+/** Human labels for the course `level` frontmatter (1–5), per locale. A site
+ *  adds its own locales via `site.difficultyLabels`. */
+export const difficultyLabels: LabelTable = {
   en: { '1': 'Beginner', '2': 'Elementary', '3': 'Intermediate', '4': 'Advanced', '5': 'Expert' },
   ko: { '1': '입문', '2': '초급', '3': '중급', '4': '고급', '5': '전문가' },
 };
 
-/** Descriptive (non-name) licenses get localized; real license names pass through. */
-const licenseLabels: Record<string, Record<string, string>> = {
+/** Descriptive (non-name) licenses get localized; real license names pass
+ *  through. A site adds its own locales via `site.licenseLabels`. */
+const licenseLabels: LabelTable = {
   en: { proprietary: 'Proprietary' },
   ko: { proprietary: '독점' },
 };
 export function licenseLabel(lang: Lang, value: string): string {
-  return licenseLabels[lang]?.[value] ?? licenseLabels[defaultLang]?.[value] ?? value;
+  return lookupLabel(siteCfg.licenseLabels, licenseLabels, lang, value) ?? value;
 }

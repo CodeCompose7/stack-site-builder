@@ -4,29 +4,32 @@ import { buildTree, type Category } from 'stack-site-builder/lib/category-tree';
 export const productCategories: Category[] = [
   {
     id: 'product-apps',
-    label: { en: 'Apps', ko: '앱', ja: 'アプリ' },
+    label: { en: 'Apps', ko: '앱', ja: 'アプリ', 'zh-CN': '应用' },
     description: {
       en: 'The apps we build and ship',
       ko: '우리가 만들어 출시하는 앱',
       ja: '私たちが作って公開するアプリ',
+      'zh-CN': '我们开发并发布的应用',
     },
   },
   {
     id: 'product-services',
-    label: { en: 'Services', ko: '서비스', ja: 'サービス' },
+    label: { en: 'Services', ko: '서비스', ja: 'サービス', 'zh-CN': '服务' },
     description: {
       en: 'Work we do for clients',
       ko: '클라이언트를 위한 작업',
       ja: 'クライアント向けの仕事',
+      'zh-CN': '为客户提供的工作',
     },
   },
   {
     id: 'product-uncategorized',
-    label: { en: 'Uncategorized', ko: '미분류', ja: '未分類' },
+    label: { en: 'Uncategorized', ko: '미분류', ja: '未分類', 'zh-CN': '未分类' },
     description: {
       en: 'Products not yet sorted into a category',
       ko: '아직 분류에 들어가지 않은 제품',
       ja: 'まだ分類されていない製品',
+      'zh-CN': '尚未归类的产品',
     },
   },
 ];

@@ -1,9 +1,8 @@
 ---
-import { site } from '@aas-data/site';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import BlogIndex from '../../../components/BlogIndex.astro';
-import { useTranslations } from '../../../i18n/ui';
+import { useTranslations, siteName } from '../../../i18n/ui';
 import { allLocales, langParam } from '../../../lib/locales';
 
 export const getStaticPaths = (() =>
@@ -13,6 +12,6 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<BaseLayout title={`${t('blog.title')} — ${site.name}`} lang={lang} path="article/">
+<BaseLayout title={`${t('blog.title')} — ${siteName(lang)}`} lang={lang} path="article/">
   <BlogIndex lang={lang} />
 </BaseLayout>

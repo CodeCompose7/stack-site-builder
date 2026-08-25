@@ -1,10 +1,9 @@
 import rss from '@astrojs/rss';
 import type { APIContext, GetStaticPaths } from 'astro';
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { site } from '@aas-data/site';
 import { getArticles, articleSlugOf } from '../../lib/articles';
 import { allLocales, langParam } from '../../lib/locales';
-import { useTranslations } from '../../i18n/ui';
+import { useTranslations, siteName } from '../../i18n/ui';
 
 // Per-locale RSS feed of the articles collection: /rss.xml (default locale)
 // and /<code>/rss.xml. Injected with the `articles` section, so a site that
@@ -25,7 +24,7 @@ export async function GET(context: APIContext) {
   // mirroring the sitemap's private-page filter.
   const articles = (await getArticles(lang)).filter((a) => !a.data.private);
   return rss({
-    title: `${site.name} — ${t('blog.title')}`,
+    title: `${siteName(lang)} — ${t('blog.title')}`,
     description: t('blog.tagline'),
     site: context.site,
     customData: `<language>${lang}</language>`,

@@ -1,11 +1,11 @@
 ---
-import { site } from '@aas-data/site';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import CategoryIndex from '../../../components/CategoryIndex.astro';
 import { allCategoryIds, categoryMap } from '@aas-data/categories';
 import { getStacksByCategory } from '../../../lib/stacks';
 import { allLocales, langParam } from '../../../lib/locales';
+import { siteName } from '../../../i18n/ui';
 
 export const getStaticPaths = (async () => {
   const paths: Awaited<ReturnType<GetStaticPaths>> = [];
@@ -23,6 +23,6 @@ const { lang, id } = Astro.props;
 const node = categoryMap.get(id)!;
 ---
 
-<BaseLayout title={`${node.label[lang]} — ${site.name}`} lang={lang} path={`categories/${id}/`}>
+<BaseLayout title={`${node.label[lang]} — ${siteName(lang)}`} lang={lang} path={`categories/${id}/`}>
   <CategoryIndex lang={lang} id={id} />
 </BaseLayout>

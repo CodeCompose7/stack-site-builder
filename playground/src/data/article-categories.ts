@@ -4,11 +4,12 @@ import { buildTree, type Category } from 'stack-site-builder/lib/category-tree';
 export const articleCategories: Category[] = [
   {
     id: 'article-uncategorized',
-    label: { en: 'Uncategorized', ko: '미분류', ja: '未分類' },
+    label: { en: 'Uncategorized', ko: '미분류', ja: '未分類', 'zh-CN': '未分类' },
     description: {
       en: 'Writing not yet sorted into a category',
       ko: '아직 분류에 들어가지 않은 글',
       ja: 'まだ分類されていない記事',
+      'zh-CN': '尚未归类的文章',
     },
   },
 ];

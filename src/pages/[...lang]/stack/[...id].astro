@@ -1,5 +1,4 @@
 ---
-import { site } from '@aas-data/site';
 import type { GetStaticPaths } from 'astro';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
@@ -7,6 +6,7 @@ import StackDetail from '../../../components/StackDetail.astro';
 import PrivateGate from '../../../components/PrivateGate.astro';
 import { getStacks, getStackAliases, slugOf, type StackEntry } from '../../../lib/stacks';
 import { allLocales, langParam } from '../../../lib/locales';
+import { siteName } from '../../../i18n/ui';
 
 export const getStaticPaths = (async () => {
   const paths: Awaited<ReturnType<GetStaticPaths>> = [];
@@ -49,7 +49,7 @@ const priv = entry?.data.private ?? false;
     </html>
   ) : (
     <BaseLayout
-      title={`${entry!.data.name} — ${site.name}`}
+      title={`${entry!.data.name} — ${siteName(lang)}`}
       description={priv ? entry!.data.teaser : entry!.data.description}
       lang={lang}
       path={`stack/${slugOf(entry!)}/`}

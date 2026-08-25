@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Lang } from '../i18n/ui';
+import { inLocale, stripLocale } from './locales';
 
 export type ProductEntry = CollectionEntry<'products'>;
 
@@ -7,14 +8,14 @@ export type ProductEntry = CollectionEntry<'products'>;
  *  nested (`flowstate-ai/privacy`), which the catch-all route renders at the
  *  matching subpath. */
 export function productSlugOf(entry: ProductEntry): string {
-  return entry.id.replace(/^[a-z]{2}\//, '');
+  return stripLocale(entry.id);
 }
 
 /** Published product pages for one locale, in `order` (then title) order. */
 export async function getProducts(lang: Lang): Promise<ProductEntry[]> {
   const all = await getCollection('products');
   return all
-    .filter((e) => e.id.startsWith(`${lang}/`) && !e.data.draft)
+    .filter((e) => inLocale(e.id, lang) && !e.data.draft)
     .sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title));
 }
 

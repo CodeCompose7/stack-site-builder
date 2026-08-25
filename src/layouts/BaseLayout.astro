@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import { site } from '@aas-data/site';
 import { getRelativeLocaleUrl } from 'astro:i18n';
-import { useTranslations, languages, type Lang } from '../i18n/ui';
+import { useTranslations, languages, siteName, defaultLang, type Lang } from '../i18n/ui';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import BackToTop from '../components/BackToTop.astro';
@@ -55,7 +55,7 @@ const baseNoSlash = base.replace(/\/$/, '');
 
 // Header brand: `site.header = { logo?: '/path.png', logoInvert?: bool,
 // name?: bool }`. A logo replaces the ⚡ bolt; `name: false` drops the
-// wordmark (logo-only brand — the link keeps site.name as its aria-label).
+// wordmark (logo-only brand — the link keeps siteName(lang) as its aria-label).
 const header = (site as { header?: { logo?: string; logoInvert?: boolean; name?: boolean } })
   .header;
 const brandLogo = header?.logo;
@@ -65,7 +65,11 @@ const brandName = header?.name !== false;
 const localeHomes = Object.fromEntries(
   (Object.keys(languages) as Lang[]).map((c) => [c, getRelativeLocaleUrl(c, '')]),
 );
-const isDefaultHome = path === '' && lang === 'en';
+// The auto-detect redirect belongs on the ROOT home — the one page served
+// without a locale prefix — which is the default locale's, whatever it is. This
+// read 'en' until 1.24.0, so a ko-default (or any non-en-default) site never
+// redirected at all.
+const isDefaultHome = path === '' && lang === defaultLang;
 
 // Standalone pages (the `pages` collection) that opt into a header-nav link,
 // e.g. an About/소개 page. Rendered as their own nav items alongside the
@@ -216,7 +220,7 @@ const navItems = allNavItems.filter((item) => !item.section || sectionEnabled(it
         <link
           rel="alternate"
           type="application/rss+xml"
-          title={`${site.name} — ${t('blog.title')}`}
+          title={`${siteName(lang)} — ${t('blog.title')}`}
           href={getRelativeLocaleUrl(lang, 'rss.xml')}
         />
       )
@@ -287,7 +291,7 @@ const navItems = allNavItems.filter((item) => !item.section || sectionEnabled(it
         <a
           href={home}
           data-keep-filters
-          aria-label={site.name}
+          aria-label={siteName(lang)}
           class="flex min-w-0 items-center gap-1.5 text-base font-bold tracking-tight whitespace-nowrap no-underline sm:text-lg"
         >
           {
@@ -302,7 +306,7 @@ const navItems = allNavItems.filter((item) => !item.section || sectionEnabled(it
             )
           }
           {/* Below 600px only the mark remains, so the narrow header never truncates the wordmark. */}
-          {brandName && <span class="hidden truncate min-[600px]:inline">{site.name}</span>}
+          {brandName && <span class="hidden truncate min-[600px]:inline">{siteName(lang)}</span>}
         </a>
         {/* Section links are icon-only (labels live in aria-label). On phones
             (<sm) they collapse into the labelled dropdown menu below, so the
