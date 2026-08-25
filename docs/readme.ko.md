@@ -38,7 +38,7 @@ export const collections = defineAasCollections({ categoryMap });
 
 | 위치 | 내용 |
 | --- | --- |
-| `src/data/site.ts` | 사이트 정체성: 이름, 저장소 URL(`repoNav: false`면 헤더 GitHub 링크 숨김), 제공 `locales`, 선택적 `sections` 토글, 브라우저 아이콘(`icons: { favicon, appleTouch, manifest }`), `home` 템플릿, 로케일별 UI 문자열 오버라이드 |
+| `src/data/site.ts` | 사이트 정체성: 이름(문자열 하나 또는 로케일별), 저장소 URL(`repoNav: false`면 헤더 GitHub 링크 숨김), 제공 `locales`, 선택적 `sections` 토글, 브라우저 아이콘(`icons: { favicon, appleTouch, manifest }`), `home` 템플릿, 로케일별 UI 문자열 오버라이드와 열거형 라벨 테이블(`pricingLabels`, `difficultyLabels`, `licenseLabels`) |
 | `src/data/categories.ts` | 도구 카탈로그 카테고리 트리 (콘텐츠와 대조 검증됨) |
 | `src/data/concept-categories.ts` · `article-categories.ts` · `course-categories.ts` · `product-categories.ts` · `paper-categories.ts` (옵트인) | 개념 / 글 / 강의 / 제품 / 논문의 분류 체계 |
 | `src/data/glossary.mjs` | `[[용어]]` 위키링크 대상 — 각 항목은 `stack` / `concept` / `article` / `course` / `paper` 페이지, 외부 `href`, 또는 정의만 있는 용어(`def`)로 연결된다 |
@@ -64,6 +64,20 @@ export const collections = defineAasCollections({ categoryMap });
    키는 기본 로케일로 폴백됩니다. 콘텐츠
    (`src/content/<컬렉션>/<코드>/…`)·용어집·카테고리 라벨도 기존 로케일과
    같은 방식으로 번역을 추가합니다.
+4. 테마가 en/ko만 내장한 열거형 라벨도 같은 형태로 공급합니다.
+   `site.pricingLabels`(`pricing` 프론트매터 열거형),
+   `site.difficultyLabels`(강의 `level` 1–5),
+   `site.licenseLabels`(`proprietary` 같은 서술형 라이선스 — 실제 라이선스
+   이름은 그대로 통과). 각각 `{ <코드>: { <키>: <라벨> } }`이고 테마 테이블
+   위에 키 단위로 병합되므로, 필요한 것만 적으면 됩니다. 테마가 내장한
+   로케일을 사이트가 다시 번역할 수도 있습니다 — 사이트 쪽이 이깁니다.
+5. 사이트 이름이 언어별로 다르면 `site.name`을 문자열 하나 대신 로케일별
+   레코드로 둡니다 — `name: { en: 'Advanced Algorithms', ko: '고급 알고리즘' }`.
+   빠진 로케일은 기본 로케일로 폴백됩니다.
+
+로케일 코드는 두 글자가 아니어도 됩니다 — `zh-CN`, `pt-BR` 모두 동작하고,
+콘텐츠 폴더는 `stacks/zh-CN/`이든 `stacks/zh-cn/`이든 괜찮습니다. Astro가
+콘텐츠 id를 만들 때 경로 조각을 소문자로 바꾸는데, 테마가 그걸 감안합니다.
 
 테마 파일은 하나도 바뀌지 않습니다 — 로케일 추가는 순전히 사이트 설정과
 콘텐츠의 일입니다.

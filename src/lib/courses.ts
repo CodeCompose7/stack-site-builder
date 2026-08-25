@@ -1,11 +1,12 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Lang } from '../i18n/ui';
+import { inLocale, stripLocale } from './locales';
 
 export type CourseEntry = CollectionEntry<'courses'>;
 
 /** The url slug of a course, i.e. its id with the `<lang>/` prefix removed. */
 export function courseSlugOf(entry: CourseEntry): string {
-  return entry.id.replace(/^[a-z]{2}\//, '');
+  return stripLocale(entry.id);
 }
 
 /**
@@ -16,7 +17,7 @@ export function courseSlugOf(entry: CourseEntry): string {
 export async function getCourses(lang: Lang): Promise<CourseEntry[]> {
   const all = await getCollection('courses');
   return all
-    .filter((e) => e.id.startsWith(`${lang}/`) && !e.data.draft)
+    .filter((e) => inLocale(e.id, lang) && !e.data.draft)
     .sort(
       (a, b) =>
         (b.data.order ?? '').localeCompare(a.data.order ?? '') ||

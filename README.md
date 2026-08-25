@@ -36,7 +36,7 @@ export const collections = defineAasCollections({ categoryMap });
 
 | Where | What |
 | --- | --- |
-| `src/data/site.ts` | Site identity: name, repo URL (`repoNav: false` hides the header's GitHub link), the `locales` it ships, optional `sections` toggles, browser icons (`icons: { favicon, appleTouch, manifest }`), the `home` template, per-locale UI string overrides |
+| `src/data/site.ts` | Site identity: name (one string, or per-locale), repo URL (`repoNav: false` hides the header's GitHub link), the `locales` it ships, optional `sections` toggles, browser icons (`icons: { favicon, appleTouch, manifest }`), the `home` template, per-locale UI string overrides and enum label tables (`pricingLabels`, `difficultyLabels`, `licenseLabels`) |
 | `src/data/categories.ts` | The tool-catalog category tree (validated against content) |
 | `src/data/concept-categories.ts` · `article-categories.ts` · `course-categories.ts` · `product-categories.ts` · `paper-categories.ts` (opt-in) | Taxonomies for concepts / articles / courses / products / papers |
 | `src/data/glossary.mjs` | `[[Term]]` wikilink targets — each entry links a term to a `stack` / `concept` / `article` / `course` / `paper` page, an external `href`, or is a definition-only term (`def`) |
@@ -63,6 +63,21 @@ locale from one source. To add a language (say Japanese):
    you omit falls back to the default locale. Add the `<code>` translations to
    your content (`src/content/<collection>/<code>/…`), glossary and category
    labels the same way you did for the built-in locales.
+4. Supply the enum labels the theme only ships in en/ko, under the same
+   per-locale shape: `site.pricingLabels` (the `pricing` frontmatter enum),
+   `site.difficultyLabels` (course `level` 1–5) and `site.licenseLabels`
+   (descriptive licenses like `proprietary`; real license names pass through).
+   Each is `{ <code>: { <key>: <label> } }`, merged per key over the theme's
+   table, so you list only what you need. A site can also retranslate a locale
+   the theme ships — the site's entry wins.
+5. If the site's own name differs per language, make `site.name` a per-locale
+   record — `name: { en: 'Advanced Algorithms', ko: '고급 알고리즘' }` — instead of
+   one string. A locale it omits falls back to the default locale.
+
+A locale code doesn't have to be two letters: `zh-CN` and `pt-BR` work, and the
+content folder may be cased either way (`stacks/zh-CN/` or `stacks/zh-cn/`) —
+Astro lowercases the path segment when it derives content ids, which the theme
+accounts for.
 
 No theme files change — adding a locale is entirely site config and content.
 

@@ -4,20 +4,22 @@ import { buildTree, type Category } from 'stack-site-builder/lib/category-tree';
 export const courseCategories: Category[] = [
   {
     id: 'ai-basics',
-    label: { en: 'AI Basics', ko: 'AI 기초', ja: 'AI基礎' },
+    label: { en: 'AI Basics', ko: 'AI 기초', ja: 'AI基礎', 'zh-CN': 'AI 基础' },
     description: {
       en: 'Foundational courses on building with AI',
       ko: 'AI 활용의 기초를 다지는 강의',
       ja: 'AI活用の基礎を固める講義',
+      'zh-CN': '用 AI 构建应用的入门课程',
     },
   },
   {
     id: 'course-uncategorized',
-    label: { en: 'Uncategorized', ko: '미분류', ja: '未分類' },
+    label: { en: 'Uncategorized', ko: '미분류', ja: '未分類', 'zh-CN': '未分类' },
     description: {
       en: 'Courses not yet sorted into a category',
       ko: '아직 분류에 들어가지 않은 강의',
       ja: 'まだ分類されていない講義',
+      'zh-CN': '尚未归类的课程',
     },
   },
 ];
