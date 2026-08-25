@@ -1,11 +1,11 @@
 ---
-import { site } from '@aas-data/site';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Home from '../../components/Home.astro';
 import CardsHome from '../../components/CardsHome.astro';
 import { homeTemplate } from '../../lib/home';
 import { allLocales, langParam } from '../../lib/locales';
+import { siteName } from '../../i18n/ui';
 
 export const getStaticPaths = (() =>
   allLocales.map((lang) => ({ params: { lang: langParam(lang) }, props: { lang } }))) satisfies GetStaticPaths;
@@ -13,6 +13,6 @@ export const getStaticPaths = (() =>
 const { lang } = Astro.props;
 ---
 
-<BaseLayout title={site.name} lang={lang} path="">
+<BaseLayout title={siteName(lang)} lang={lang} path="">
   {homeTemplate === 'cards' ? <CardsHome lang={lang} /> : <Home lang={lang} />}
 </BaseLayout>

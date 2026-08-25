@@ -1,5 +1,4 @@
 ---
-import { site } from '@aas-data/site';
 import { render } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
@@ -10,6 +9,7 @@ import MermaidLoader from '../../../components/MermaidLoader.astro';
 import { getProducts, productSlugOf } from '../../../lib/products';
 import { allLocales, langParam } from '../../../lib/locales';
 import { inlineMd } from '../../../lib/inline-md';
+import { siteName } from '../../../i18n/ui';
 
 export const getStaticPaths = (async () => {
   const paths: Awaited<ReturnType<GetStaticPaths>> = [];
@@ -32,7 +32,7 @@ const bodyHasMermaid = (entry.body ?? '').includes('```mermaid');
 ---
 
 <BaseLayout
-  title={`${entry.data.title} — ${site.name}`}
+  title={`${entry.data.title} — ${siteName(lang)}`}
   description={priv ? entry.data.teaser : (entry.data.description ?? entry.data.subtitle)}
   lang={lang}
   path={`products/${slug}/`}

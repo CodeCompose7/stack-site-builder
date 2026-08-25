@@ -17,11 +17,13 @@ export default defineConfig({
   site: 'https://example.invalid',
   base: '/',
 
-  // Three locales — en (default, served at root), ko and ja (under /ko/, /ja/).
-  // The theme reads this list to inject routes and detect content locales; the
-  // matching display names / date formats live in src/data/site.ts `locales`.
+  // Four locales — en (default, served at root), ko, ja and zh-CN (under
+  // /ko/, /ja/, /zh-CN/). The theme reads this list to inject routes and detect
+  // content locales; the matching display names / date formats live in
+  // src/data/site.ts `locales`. `zh-CN` is here to keep a non-two-letter code
+  // covered — the theme derives content-id prefixes from the code itself.
   i18n: {
-    locales: ['en', 'ko', 'ja'],
+    locales: ['en', 'ko', 'ja', 'zh-CN'],
     defaultLocale: 'en',
     routing: {
       prefixDefaultLocale: false,

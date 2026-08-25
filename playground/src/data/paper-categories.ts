@@ -4,20 +4,22 @@ import { buildTree, type Category } from 'stack-site-builder/lib/category-tree';
 export const paperCategories: Category[] = [
   {
     id: 'paper-architecture',
-    label: { en: 'Architectures', ko: '아키텍처', ja: 'アーキテクチャ' },
+    label: { en: 'Architectures', ko: '아키텍처', ja: 'アーキテクチャ', 'zh-CN': '架构' },
     description: {
       en: 'Model architectures and training methods',
       ko: '모델 아키텍처와 학습 방법',
       ja: 'モデルアーキテクチャと学習方法',
+      'zh-CN': '模型架构与训练方法',
     },
   },
   {
     id: 'paper-uncategorized',
-    label: { en: 'Uncategorized', ko: '미분류', ja: '未分類' },
+    label: { en: 'Uncategorized', ko: '미분류', ja: '未分類', 'zh-CN': '未分类' },
     description: {
       en: 'Papers not yet sorted into a category',
       ko: '아직 분류에 들어가지 않은 논문',
       ja: 'まだ分類されていない論文',
+      'zh-CN': '尚未归类的论文',
     },
   },
 ];

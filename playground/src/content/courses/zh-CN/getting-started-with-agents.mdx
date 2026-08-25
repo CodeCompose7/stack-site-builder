@@ -1,0 +1,34 @@
+---
+title: AI 智能体入门
+description: 亲手做出第一个 AI 智能体的实践课程 —— 工具、循环与护栏。
+summary: 一步一步搭建你的第一个 AI 智能体。
+date: 2026-06-01
+updated: 2026-08-25
+version: "1.1"
+category: ai-basics
+tags: [agents, beginner]
+level: 2
+hours: "1:30"
+order: "2601-01"
+---
+
+import Lead from 'stack-site-builder/components/Lead.astro';
+
+<Lead>智能体就是一个循环：模型做判断、工具去执行、结果再回到模型。这门课从零搭出这个循环。</Lead>
+
+## 你会做出什么 \{#what-youll-build}
+
+一个能检索并总结的单文件智能体，并带上预算护栏。课程卡片上的难度标签（"初级"）
+来自站点自己的 `difficultyLabels`。
+
+```mermaid
+flowchart LR
+  U[用户] --> M[模型]
+  M -->|调用工具| T[工具]
+  T -->|结果| M
+  M --> A[回答]
+```
+
+## 前置条件 \{#prerequisites}
+
+基础的 Python 和一个 API key。

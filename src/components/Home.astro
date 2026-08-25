@@ -8,7 +8,7 @@ import { getStacks, slugOf } from '../lib/stacks';
 import { site } from '@aas-data/site';
 import { deriveFacets } from '../lib/facets';
 import { memberOnlyInIndex } from '../lib/listing';
-import { useTranslations, type Lang } from '../i18n/ui';
+import { useTranslations, siteName, type Lang } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
@@ -33,7 +33,7 @@ const facets = deriveFacets(entries, lang);
 ---
 
 <section class="py-6">
-  <h1 class="text-4xl font-bold tracking-tight">{site.name}</h1>
+  <h1 class="text-4xl font-bold tracking-tight">{siteName(lang)}</h1>
   <p class="mt-3 max-w-2xl text-lg text-[var(--aas-muted)]">{t('site.tagline')}</p>
 </section>
 

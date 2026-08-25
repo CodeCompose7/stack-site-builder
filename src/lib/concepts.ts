@@ -1,18 +1,19 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Lang } from '../i18n/ui';
+import { inLocale, stripLocale } from './locales';
 
 export type ConceptEntry = CollectionEntry<'concepts'>;
 
 /** The url slug of a concept, i.e. its id with the `<lang>/` prefix removed. */
 export function conceptSlugOf(entry: ConceptEntry): string {
-  return entry.id.replace(/^[a-z]{2}\//, '');
+  return stripLocale(entry.id);
 }
 
 /** Published concepts for one locale, by `order` then title. */
 export async function getConcepts(lang: Lang): Promise<ConceptEntry[]> {
   const all = await getCollection('concepts');
   return all
-    .filter((e) => e.id.startsWith(`${lang}/`) && !e.data.draft)
+    .filter((e) => inLocale(e.id, lang) && !e.data.draft)
     .sort(
       (a, b) =>
         (a.data.order ?? 999) - (b.data.order ?? 999) ||

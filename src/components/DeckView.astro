@@ -1,11 +1,10 @@
 ---
-import { site } from '@aas-data/site';
 import '../styles/global.css';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { render, type CollectionEntry } from 'astro:content';
 import MermaidLoader from './MermaidLoader.astro';
 import PrivateGate from './PrivateGate.astro';
-import { useTranslations, type Lang } from '../i18n/ui';
+import { useTranslations, siteName, type Lang } from '../i18n/ui';
 import { siteIcons } from '../lib/icons';
 
 // Renders a full-screen slide deck as a horizontal scroll-snap presentation.
@@ -31,7 +30,7 @@ const priv = entry.data.private;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{entry.data.title} — {site.name}</title>
+    <title>{entry.data.title} — {siteName(lang)}</title>
     <meta name="description" content={(priv ? entry.data.teaser : entry.data.description) ?? ''} />
     {priv && <meta name="robots" content="noindex" />}
     <link rel="icon" {...(siteIcons.faviconType ? { type: siteIcons.faviconType } : {})} href={`${base}${siteIcons.favicon}`} />
