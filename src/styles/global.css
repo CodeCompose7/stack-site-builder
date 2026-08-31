@@ -866,6 +866,35 @@ summary {
   background: color-mix(in srgb, var(--aas-panel) 45%, transparent);
 }
 
+/* Math (`$$…$$`, rendered to HTML + MathML at build time by rehype-katex).
+   KaTeX draws everything in `currentColor`, so it picks up the theme — and the
+   dark/light swap — with no palette work here. What it does NOT do is stay
+   inside its column: a long derivation is one unbreakable line, so the same
+   argument as `.aas-table-scroll` applies and the display block takes the
+   scroll. The vertical padding is what makes that safe — `overflow-x: auto`
+   promotes `overflow-y` to `auto` unless it is pinned, and pinning it to
+   `hidden` would shave the top of a tall fraction or the tail of a descender. */
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  padding: 0.5em 0;
+}
+/* Inline math sits in running text, so it must not introduce its own scrollbar
+   or stretch the line box; KaTeX's 1.21em default is a touch large next to our
+   body size. */
+.prose .katex {
+  font-size: 1.1em;
+}
+/* A formula KaTeX could not parse. A production build fails on one (see
+   `rehypeMathErrors` in markdown.mjs), so this only ever shows in a dev server,
+   where being loud is exactly the point. */
+.katex-error {
+  color: var(--aas-role-guard);
+  border-bottom: 1px dotted currentColor;
+}
+
 /* ── Listing density: gallery (compact mini-cards) ───────────────────────────
    Toggled by [data-view='gallery'] on <html> (persisted in localStorage). A
    denser grid plus a stripped-down card — logo, name, stars, pricing, and a
