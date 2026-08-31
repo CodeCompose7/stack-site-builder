@@ -889,6 +889,14 @@ summary {
 .aas-slide-inner .katex {
   font-size: 1.1em;
 }
+/* Inline math inherits the paragraph it sits in and so scales with it, but a
+   display block is a direct child of `.aas-slide-inner`, whose own font-size is
+   the 1rem root — not the clamp() that slide prose gets. Left alone a centred
+   formula renders at ~17px beside 26px text, reading as a footnote to the
+   slide rather than the point of it. Hand it the same scale as `p`. */
+.aas-slide-inner .katex-display {
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+}
 /* KaTeX's fonts carry no Hangul, kana or Han glyphs, so for `\text{처리량}` it
    tags the run with `.hangul_fallback` (or `.cjk_fallback` / `.brahmic_fallback`)
    and ships NO rule for them — the font is left to the site on purpose. Without

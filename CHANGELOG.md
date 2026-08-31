@@ -11,6 +11,18 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.25.2] - 2026-08-31
+
+### Fixed
+
+- **A display formula on a slide rendered at half the size of the text beside
+  it.** Inline math inherits the paragraph it sits in and so already scaled
+  with slide prose, but a display block is a direct child of
+  `.aas-slide-inner`, whose own font-size is the 1rem root rather than the
+  `clamp()` that slide paragraphs get — so a centred equation came out around
+  17px next to 26px copy, reading as a footnote to the slide instead of the
+  point of it. It now takes the same scale as `p`.
+
 ## [1.25.1] - 2026-08-31
 
 ### Fixed
