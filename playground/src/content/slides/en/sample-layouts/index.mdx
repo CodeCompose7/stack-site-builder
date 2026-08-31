@@ -849,6 +849,18 @@ KaTeX runs at build time, so the slide ships plain HTML and no math runtime.
 
 <Slide toc={false}>
 
+### A slide whose content borrows the chrome's attribute names
+
+<div data-total="99" data-current="99" data-progress="99" data-next="99">
+  <p>This block carries `data-total`, `data-current`, `data-progress` and
+  `data-next`. The pager below must still read the real slide count, and this
+  paragraph must survive: chrome lookups skip anything inside a slide.</p>
+</div>
+
+</Slide>
+
+<Slide toc={false}>
+
 ## This heading is not in the TOC
 
 This slide is wrapped in `<Slide toc={false}>`. Open the TOC (☰) and this heading **won't be listed** — the slide itself still pages through normally.

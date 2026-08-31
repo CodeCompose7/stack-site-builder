@@ -11,6 +11,22 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.25.3] - 2026-09-01
+
+### Fixed
+
+- **A slide's own content could be mistaken for the deck's chrome.** The deck
+  marks its pager, progress bar, TOC and menu with short `data-*` names
+  (`data-total`, `data-current`, `data-next` …) and looked each one up with
+  `document.querySelector`, which returns whichever comes first in the
+  document — and a slide comes before the pager. A site component sitting in a
+  slide that used any of those names was found instead, so a stepping demo
+  carrying `data-total` had its entire subtree replaced by the slide count and
+  the pager then read `1 / 1`. Chrome lookups now skip anything inside
+  `.aas-slide`: slide content is never chrome. The `sample-layouts` deck gained
+  a slide that deliberately carries four of those attributes so the collision
+  stays covered.
+
 ## [1.25.2] - 2026-08-31
 
 ### Fixed
