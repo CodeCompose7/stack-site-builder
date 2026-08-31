@@ -414,6 +414,30 @@ function remarkGlossary({ glossary, locales = ['en', 'ko'], defaultLocale = 'en'
   };
 }
 
+// KaTeX cannot parse everything, and rehype-katex's answer to a formula it
+// chokes on is a warning nobody reads plus red text in the published page. That
+// is the silent-degradation failure mode this pipeline already refuses for
+// wikilinks, so promote it the same way: fail the build. Runs immediately after
+// rehypeKatex, which records each failure on the vfile.
+function rehypeMathErrors() {
+  return (/** @type {any} */ _tree, /** @type {any} */ file) => {
+    /** @type {any[]} */
+    const messages = file.messages || [];
+    const bad = messages.filter((m) => m.source === 'rehype-katex');
+    if (!bad.length) return;
+    // Drop them from the vfile so the thrown error is the only report.
+    file.messages = messages.filter((m) => m.source !== 'rehype-katex');
+    const where = file.path || (file.history && file.history[0]) || 'unknown file';
+    const detail = bad
+      .map((m) => {
+        const at = m.place && m.place.start ? `${m.place.start.line}:${m.place.start.column} ` : '';
+        return `  - ${at}${(m.cause && m.cause.message) || m.reason}`;
+      })
+      .join('\n');
+    throw new Error(`[math] KaTeX could not parse ${bad.length} formula(s) in ${where}:\n${detail}`);
+  };
+}
+
 // Math is written with DOUBLE dollars — `$$E = mc^2$$` inline, or a `$$` fence
 // on its own lines for a display block (three or more dollars work the same, so
 // `$$$ … $$$` is a valid fence too, as long as the closing run is at least as
@@ -461,6 +485,7 @@ export function aasMarkdown({ glossary, locales = ['en', 'ko'], defaultLocale = 
       rehypeSlug,
       rehypeHeadingAnchors,
       [rehypeKatex, KATEX_OPTIONS],
+      rehypeMathErrors,
       rehypeTableScroll,
       [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
     ],
