@@ -31,3 +31,26 @@ updated: 2026-07-23
 - Scaled dot-product attention과 multi-head attention
 - 순환 대신 positional encoding
 - 어텐션과 feed-forward만으로 쌓은 인코더–디코더 스택
+
+## 어텐션 수식 \{#formula}
+
+인라인 수식은 달러 두 개 사이에 씁니다: $$\mathrm{softmax}(z)_i = e^{z_i} / \sum_j e^{z_j}$$.
+펜스를 독립된 줄에 두면 가운데 정렬된 블록으로 렌더링됩니다:
+
+$$
+\mathrm{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+$$
+
+달러 세 개도 똑같이 동작해서, 수식 본문에 `$$`가 들어갈 때 펜스를 알아보기 쉽게
+유지할 수 있습니다:
+
+$$$
+\mathrm{MultiHead}(Q, K, V) = \mathrm{Concat}(\mathrm{head}_1, \dots, \mathrm{head}_h) W^O
+\quad\text{where}\quad
+\mathrm{head}_i = \mathrm{Attention}(Q W_i^Q, K W_i^K, V W_i^V)
+$$$
+
+`\text{}` 안의 한글도 경고 없이 그대로 나옵니다 — $$\text{처리량} = \frac{N}{t}$$.
+
+가격은 건드리지 않습니다: base 모델은 8 GPU에서 $12시간, big 모델은 $84시간
+학습했습니다.

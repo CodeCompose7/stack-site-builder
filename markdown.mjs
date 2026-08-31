@@ -1,12 +1,14 @@
 // @ts-check
 // The shared Markdown/MDX pipeline for awesome-*-stack sites: heading ids +
-// copy-link anchors, mermaid fences, slide directives, and [[wikilink]]
-// resolution against the site's glossary. Sites get the whole pipeline from
-// the theme integration (index.mjs); `aasMarkdown({ glossary })` is also
-// exported for direct use.
+// copy-link anchors, mermaid fences, slide directives, LaTeX math, and
+// [[wikilink]] resolution against the site's glossary. Sites get the whole
+// pipeline from the theme integration (index.mjs); `aasMarkdown({ glossary })`
+// is also exported for direct use.
 import rehypeExternalLinks from 'rehype-external-links';
+import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
 import remarkDirective from 'remark-directive';
+import remarkMath from 'remark-math';
 
 // Prepend a "#" copy-link anchor to h2/h3/h4 headings (a global click handler
 // in BaseLayout copies the section URL). The "#" count per level is drawn via
@@ -412,25 +414,78 @@ function remarkGlossary({ glossary, locales = ['en', 'ko'], defaultLocale = 'en'
   };
 }
 
+// KaTeX cannot parse everything, and rehype-katex's answer to a formula it
+// chokes on is a warning nobody reads plus red text in the published page. That
+// is the silent-degradation failure mode this pipeline already refuses for
+// wikilinks, so promote it the same way: fail the build. Runs immediately after
+// rehypeKatex, which records each failure on the vfile.
+function rehypeMathErrors() {
+  return (/** @type {any} */ _tree, /** @type {any} */ file) => {
+    /** @type {any[]} */
+    const messages = file.messages || [];
+    const bad = messages.filter((m) => m.source === 'rehype-katex');
+    if (!bad.length) return;
+    // Drop them from the vfile so the thrown error is the only report.
+    file.messages = messages.filter((m) => m.source !== 'rehype-katex');
+    const where = file.path || (file.history && file.history[0]) || 'unknown file';
+    const detail = bad
+      .map((m) => {
+        const at = m.place && m.place.start ? `${m.place.start.line}:${m.place.start.column} ` : '';
+        return `  - ${at}${(m.cause && m.cause.message) || m.reason}`;
+      })
+      .join('\n');
+    throw new Error(`[math] KaTeX could not parse ${bad.length} formula(s) in ${where}:\n${detail}`);
+  };
+}
+
+// Math is written with DOUBLE dollars — `$$E = mc^2$$` inline, or a `$$` fence
+// on its own lines for a display block (three or more dollars work the same, so
+// `$$$ … $$$` is a valid fence too, as long as the closing run is at least as
+// long as the opening one). Single `$…$` is deliberately OFF: these are catalog
+// sites full of prices, and "plans start at $8 and go to $20" would otherwise
+// silently turn into math. A site that wants single-dollar math can opt in with
+// `aasMarkdown({ math: { singleDollar: true } })`.
+const MATH_SYNTAX = { singleDollarTextMath: false };
+
+// KaTeX renders at BUILD time (rehype-katex), so pages ship plain HTML + MathML
+// with no client-side math runtime; the stylesheet is pulled in by BaseLayout.
+const KATEX_OPTIONS = {
+  // KaTeX's `strict` mode warns about non-Latin characters inside `\text{…}`,
+  // which for bilingual ko/en content is the normal case, not a mistake
+  // (`\text{처리량}`). Silence just that rule and keep the rest of the warnings.
+  /** @param {string} code */
+  strict: (/** @type {string} */ code) => (code === 'unicodeTextInMathMode' ? 'ignore' : 'warn'),
+};
+
 /**
  * The full markdown config for `defineConfig({ markdown })`.
- * @param {{ glossary: Record<string, any>, locales?: string[], defaultLocale?: string }} opts
+ * @param {{ glossary: Record<string, any>, locales?: string[], defaultLocale?: string,
+ *          math?: { singleDollar?: boolean } }} opts
  *   `glossary` — the site's wikilink targets (pass `{}` for none). `locales` /
  *   `defaultLocale` come from the site's astro.config `i18n` so wikilink locale
  *   detection matches whatever locales the site ships (defaults to en/ko).
+ *   `math.singleDollar` opts into `$…$` inline math (see MATH_SYNTAX).
  */
-export function aasMarkdown({ glossary, locales = ['en', 'ko'], defaultLocale = 'en' }) {
+export function aasMarkdown({ glossary, locales = ['en', 'ko'], defaultLocale = 'en', math = {} }) {
   return {
     remarkPlugins: [
       remarkHeadingIds,
+      // Before remarkMermaid/remarkDirective only for readability — all three
+      // are micromark syntax extensions, so the parser applies them together.
+      [remarkMath, { ...MATH_SYNTAX, singleDollarTextMath: math.singleDollar === true }],
       remarkMermaid,
       remarkDirective,
       remarkSlideDirectives,
       [remarkGlossary, { glossary, locales, defaultLocale }],
     ],
     rehypePlugins: [
+      // rehypeSlug runs first so a heading with math slugs from the SOURCE
+      // (`## $$x^2$$` → "x2"); after KaTeX the heading's text content is the
+      // whole rendered glyph soup and the id would be unusable.
       rehypeSlug,
       rehypeHeadingAnchors,
+      [rehypeKatex, KATEX_OPTIONS],
+      rehypeMathErrors,
       rehypeTableScroll,
       [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
     ],
