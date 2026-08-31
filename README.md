@@ -218,7 +218,7 @@ import Bookmark from 'stack-site-builder/components/Bookmark.astro';
 ```
 
 Markdown/MDX authoring gotchas (nested-list indentation, blockquotes, hard
-breaks, wikilinks): `docs/content-authoring.md`.
+breaks, wikilinks, math): `docs/content-authoring.md`.
 
 ## RSS
 

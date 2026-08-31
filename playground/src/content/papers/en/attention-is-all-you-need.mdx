@@ -31,3 +31,24 @@ dependencies — the architecture behind every modern LLM.
 - Scaled dot-product attention and multi-head attention
 - Positional encodings instead of recurrence
 - Encoder–decoder stacks built purely from attention and feed-forward layers
+
+## The attention formula \{#formula}
+
+Inline math sits in a double-dollar span: $$\mathrm{softmax}(z)_i = e^{z_i} / \sum_j e^{z_j}$$.
+A fence on its own lines renders a centred display block:
+
+$$
+\mathrm{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+$$
+
+Three dollars work the same, which keeps a fence readable when the body itself
+contains `$$`:
+
+$$$
+\mathrm{MultiHead}(Q, K, V) = \mathrm{Concat}(\mathrm{head}_1, \dots, \mathrm{head}_h) W^O
+\quad\text{where}\quad
+\mathrm{head}_i = \mathrm{Attention}(Q W_i^Q, K W_i^K, V W_i^V)
+$$$
+
+Prices are left alone: the encoder–decoder base model trained for $12 hours on
+8 GPUs, and the big model for $84 hours.

@@ -93,3 +93,45 @@ block-level element and its columns collapse to fit. Prefer pipe tables.
 row in the README's "What a site supplies" table for the target kinds
 (`stack` / `concept` / `article` / `course` / `paper` / `href` / `def`). An
 unknown term fails the build, so a typo can't silently degrade to plain text.
+
+## Math
+
+LaTeX is written between **double** dollars and rendered by KaTeX at build time,
+so a page ships plain HTML + MathML with no math runtime on the client.
+
+`$$…$$` on a line is inline math; a `$$` fence on its own lines is a centred
+display block:
+
+```md
+The softmax over logits is $$\sigma(z)_i = e^{z_i} / \sum_j e^{z_j}$$.
+
+$$
+\mathrm{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+$$
+```
+
+A longer run of dollars opens an equivalent fence (`$$$ … $$$`), which is what
+you want when the formula itself contains `$$`. The closing run has to be at
+least as long as the opening one.
+
+**A single `$…$` is not math.** These sites are full of prices, and enabling it
+would quietly turn "the base model trained for $12 hours … the big model for $84
+hours" into one equation running from the first dollar to the second. A site
+whose prose has no loose dollar signs can opt in:
+
+```js
+integrations: [aasTheme({ glossary, math: { singleDollar: true } })],
+```
+
+Two things worth knowing:
+
+- **A formula KaTeX can't parse fails the build**, the same way an unknown
+  wikilink does, with the file, the line:column and KaTeX's own diagnostic. It
+  will not degrade to red text on the published page.
+- **Curly braces need no escaping inside math**, even in `.mdx`. Elsewhere in an
+  `.mdx` body `{` opens a JSX expression and has to be written `\{` (which is why
+  headings carry `\{#id}`), but math is a raw span to the parser, so
+  `$$\frac{a}{b}$$` is written exactly as you'd write it in LaTeX.
+
+Non-Latin text inside `\text{}` is fine and warning-free — `$$\text{처리량} =
+\frac{N}{t}$$` renders as written.
