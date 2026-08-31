@@ -100,9 +100,13 @@ const OPT_IN_SECTIONS = new Set(['courses', 'products', 'papers']);
  *   toggles (`{ slides: false }`); a disabled section's routes are not injected.
  *   `courses` is opt-IN (`{ courses: true }`) — it needs site-side course data.
  *   Keep it in sync with `src/data/site.ts` `sections` (which hides the nav item).
+ * @param {{ singleDollar?: boolean }} [opts.math] — math syntax. `$$…$$` is
+ *   always on; `{ singleDollar: true }` additionally reads `$…$` as inline math.
+ *   Off by default because a catalog site's prose is full of prices — see
+ *   MATH_SYNTAX in markdown.mjs.
  * @returns {import('astro').AstroIntegration[]}
  */
-export default function aasTheme({ glossary, sections = {} }) {
+export default function aasTheme({ glossary, sections = {}, math = {} }) {
   /** @type {import('astro').AstroIntegration} */
   const core = {
     name: 'stack-site-builder',
@@ -138,7 +142,7 @@ export default function aasTheme({ glossary, sections = {} }) {
         });
 
         updateConfig({
-          markdown: aasMarkdown({ glossary, locales, defaultLocale }),
+          markdown: aasMarkdown({ glossary, locales, defaultLocale, math }),
 
           // Bind the dev server to 0.0.0.0 so it's reachable from a browser on
           // the host (outside the Docker container).

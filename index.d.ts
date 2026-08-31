@@ -25,6 +25,14 @@ export interface AasThemeOptions {
    * `sections` so its header-nav item is hidden too.
    */
   sections?: Partial<Record<SectionKey, boolean>>;
+  /**
+   * Math syntax. `$$…$$` (inline, or a fence on its own lines for a display
+   * block) is always on. `singleDollar` additionally reads `$…$` as inline
+   * math; it is off by default because these are catalog sites whose prose is
+   * full of prices, and "plans start at $8 and go to $20" would otherwise
+   * silently render as an equation.
+   */
+  math?: { singleDollar?: boolean };
 }
 
 /**
