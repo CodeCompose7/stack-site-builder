@@ -11,6 +11,23 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.25.1] - 2026-08-31
+
+### Fixed
+
+- **Math in a slide deck rendered twice** — a deck is the one route that does
+  not go through `BaseLayout`; `DeckView.astro` renders the whole `<html>`
+  itself, so it never picked up the layout's `katex.min.css` import. Without
+  that stylesheet the MathML copy rehype-katex emits for screen readers loses
+  the rule that clips it out of view, and every formula showed up twice: once
+  as unstyled MathML source and once as the real KaTeX drawing beside it. The
+  deck now imports the stylesheet too, and `sample-layouts` gained a Math
+  section so the deck path is covered the way the article path already was.
+- **Inline math in a slide was oversized** — the `font-size: 1.1em` that trims
+  KaTeX's 1.21em default was scoped to `.prose`, which a slide is not. It now
+  applies under `.aas-slide-inner` as well, so a formula mid-sentence matches
+  the text around it on a slide the same as in an article.
+
 ## [1.25.0] - 2026-08-31
 
 Papers and courses routinely carry formulas, and until now a site's only

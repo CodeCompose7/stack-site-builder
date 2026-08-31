@@ -135,3 +135,6 @@ Two things worth knowing:
 
 Non-Latin text inside `\text{}` is fine and warning-free — `$$\text{처리량} =
 \frac{N}{t}$$` renders as written.
+
+Math works the same inside a slide deck, and a display block behaves like a
+diagram or an image there: it can sit on either side of an `aas-split`.

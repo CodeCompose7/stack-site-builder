@@ -798,6 +798,54 @@ async function runAgent(input: string) {
 
 </Slide>
 
+<Slide class="center">
+
+## 수식
+
+수식 슬라이드 — 인라인 · 디스플레이 · 텍스트 분할
+
+</Slide>
+
+<Slide>
+
+### 수식 기본
+
+펜스가 한 줄에 홀로 서면 가운데 정렬된 디스플레이 블록이 됩니다.
+
+$$
+F(n) = \begin{cases}
+0 & n = 0 \\
+1 & n = 1 \\
+F(n-1) + F(n-2) & n > 1
+\end{cases}
+$$
+
+문장 안에 두면 인라인입니다. 재귀는 $$O(2^n)$$, 반복은 $$O(n)$$ 입니다.
+
+</Slide>
+
+<Slide>
+
+### 수식 왼쪽, 텍스트 오른쪽
+
+<div class="aas-split">
+
+$$
+\text{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+$$
+
+<div>
+
+KaTeX는 빌드 시점에 돌기 때문에 슬라이드에는 순수 HTML만 실리고 수식 런타임이 실리지 않습니다.
+
+- `currentColor`로 그리므로 라이트·다크 전환에 손댈 것이 없습니다.
+- 긴 전개는 슬라이드를 넓히지 않고 자기 블록 안에서 가로로 스크롤합니다.
+
+</div>
+</div>
+
+</Slide>
+
 <Slide toc={false}>
 
 ## 이 제목은 목차에 없습니다

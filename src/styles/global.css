@@ -883,8 +883,10 @@ summary {
 }
 /* Inline math sits in running text, so it must not introduce its own scrollbar
    or stretch the line box; KaTeX's 1.21em default is a touch large next to our
-   body size. */
-.prose .katex {
+   body size. A slide is not `.prose` — it carries its own type scale — but the
+   same mismatch shows up there, so both roots get the rule. */
+.prose .katex,
+.aas-slide-inner .katex {
   font-size: 1.1em;
 }
 /* KaTeX's fonts carry no Hangul, kana or Han glyphs, so for `\text{처리량}` it

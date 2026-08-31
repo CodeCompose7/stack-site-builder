@@ -1,5 +1,11 @@
 ---
 import '../styles/global.css';
+// A deck is its own document root (this component renders the whole <html>), so
+// it does not inherit BaseLayout's stylesheet imports and needs KaTeX's own
+// stylesheet here as well. Without it the MathML copy that rehype-katex emits
+// for screen readers loses the rule that hides it and renders as a second,
+// unstyled formula beside the real one.
+import 'katex/dist/katex.min.css';
 import { getRelativeLocaleUrl } from 'astro:i18n';
 import { render, type CollectionEntry } from 'astro:content';
 import MermaidLoader from './MermaidLoader.astro';
