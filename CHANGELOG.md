@@ -11,6 +11,55 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.25.0] - 2026-08-31
+
+Papers and courses routinely carry formulas, and until now a site's only
+option was to drop in a screenshot or fake it with Unicode. This release adds
+LaTeX math to the markdown pipeline, rendered by KaTeX at build time, with the
+theme's existing dollar-sign prices left alone by default.
+
+### Added
+
+- **LaTeX math in the markdown pipeline** — `$$…$$` renders as math: inline
+  when it sits mid-line, a centered display block when the fence stands alone
+  on its own lines. A longer run of dollars (`$$$…$$$`) opens an equivalent
+  fence for a formula that itself contains `$$`. Single `$…$` is deliberately
+  left as plain text — these are catalog sites full of prices, and "plans
+  start at $8 and go to $20" would otherwise silently become an equation — so
+  a site opts in explicitly with `math: { singleDollar: true }`, now
+  available on both `aasMarkdown()` and, newly, `aasTheme()`, which previously
+  had no way to forward the option at all. KaTeX runs at build time via
+  rehype-katex, so pages ship plain HTML + MathML with no math runtime on the
+  client, and `\text{}` renders unicode text (`\text{처리량}`) without
+  KaTeX's usual strict-mode warning, since that's the normal case in
+  bilingual content rather than a mistake.
+- **A formula KaTeX can't parse fails the build** — rehype-katex's own answer
+  to unparsable LaTeX is a vfile warning nobody reads plus red error text
+  baked into the published page, the same silent degradation this pipeline
+  already refuses for an unknown wikilink. `rehypeMathErrors` turns each such
+  warning into a thrown build error naming the file and the `line:column`
+  alongside KaTeX's own diagnostic.
+- **KaTeX ships themed and scrollable** — its stylesheet and fonts load
+  site-wide (~7 kB gzipped added to the shared bundle; the 20 font faces are
+  only fetched by a page that actually renders math) and draw in
+  `currentColor`, so math follows the light/dark theme with no palette work
+  needed. A display block wider than its column scrolls horizontally instead
+  of squeezing, matching how wide tables already behave, and inline math is
+  sized to 1.1em to match body text. KaTeX's Hangul/kana/Han fallback
+  classes, which ship with no font by design, now point at the site's own
+  sans, so `\text{처리량}` renders in the site font instead of falling
+  through to a mismatched system pick.
+
+### Changed
+
+- **The playground's Attention paper demonstrates the math syntax**, in both
+  locales — inline math, a `$$` display fence, a `$$$` fence, prices left
+  untouched, and `\text{처리량}` rendering warning-free.
+  `docs/content-authoring.md` gains a matching Math section covering both
+  fence forms, the single-dollar opt-in, the build-fails-on-error behavior,
+  and the one MDX escaping rule that does not apply inside math (braces need
+  no `\{`).
+
 ## [1.24.0] - 2026-08-25
 
 Adding a locale was already meant to be site config only — the README said so —
@@ -520,6 +569,7 @@ catalog sites from a thin content-only repository.
 - **Standalone development setup** — a devcontainer and a minimal `playground/`
   consuming site for developing and previewing the theme on its own.
 
+[1.25.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.24.0...v1.25.0
 [1.24.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.2...v1.24.0
 [1.23.2]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.1...v1.23.2
 [1.23.1]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.0...v1.23.1
