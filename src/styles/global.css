@@ -887,6 +887,17 @@ summary {
 .prose .katex {
   font-size: 1.1em;
 }
+/* KaTeX's fonts carry no Hangul, kana or Han glyphs, so for `\text{처리량}` it
+   tags the run with `.hangul_fallback` (or `.cjk_fallback` / `.brahmic_fallback`)
+   and ships NO rule for them — the font is left to the site on purpose. Without
+   one the run falls through KaTeX_Main to whatever the browser picks next, which
+   renders Korean loose and letterform-mismatched beside the prose it sits in.
+   Hand it the site stack (Pretendard first) so math text matches body text. */
+.katex .hangul_fallback,
+.katex .cjk_fallback,
+.katex .brahmic_fallback {
+  font-family: var(--aas-sans);
+}
 /* A formula KaTeX could not parse. A production build fails on one (see
    `rehypeMathErrors` in markdown.mjs), so this only ever shows in a dev server,
    where being loud is exactly the point. */
