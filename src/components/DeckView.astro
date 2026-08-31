@@ -164,6 +164,19 @@ const priv = entry.data.private;
       // encrypted payload, so this no-ops at load and runs after decryption.
       initOnReady(() => {
       const deck = document.querySelector<HTMLElement>('[data-deck]');
+      // The chrome marks itself with short data-* names (data-total, data-next,
+      // data-progress …), and a site's own component sitting inside a slide may
+      // reasonably use the same one — a stepping demo carrying `data-total` had
+      // its entire subtree replaced by the slide count, because
+      // document.querySelector returns whichever comes first in the document
+      // and the slide comes before the pager. Chrome lookups therefore skip
+      // anything inside a slide: slide content is never chrome.
+      const chrome = <T extends Element>(sel: string): T | null => {
+        for (const el of Array.from(document.querySelectorAll<T>(sel))) {
+          if (!el.closest('.aas-slide')) return el;
+        }
+        return null;
+      };
       if (deck && !deck.dataset.aasInit) {
         deck.dataset.aasInit = '1';
         // Animate slide changes unless the deck opts out (data-transition="none")
@@ -172,11 +185,11 @@ const priv = entry.data.private;
         const animate = deck.dataset.transition !== 'none' && !reduceMotion;
         const slides = Array.from(deck.querySelectorAll<HTMLElement>('.aas-slide'));
         const total = slides.length;
-        const elCur = document.querySelector<HTMLElement>('[data-current]');
-        const elTot = document.querySelector<HTMLElement>('[data-total]');
-        const elFill = document.querySelector<HTMLElement>('[data-progress]');
-        const btnPrev = document.querySelector<HTMLButtonElement>('[data-prev]');
-        const btnNext = document.querySelector<HTMLButtonElement>('[data-next]');
+        const elCur = chrome<HTMLElement>('[data-current]');
+        const elTot = chrome<HTMLElement>('[data-total]');
+        const elFill = chrome<HTMLElement>('[data-progress]');
+        const btnPrev = chrome<HTMLButtonElement>('[data-prev]');
+        const btnNext = chrome<HTMLButtonElement>('[data-next]');
         if (elTot) elTot.textContent = String(total);
 
         // Heavy embeds (interactive demo iframes) jank slide transitions the
@@ -416,9 +429,9 @@ const priv = entry.data.private;
         // Collect headings h2..h{toc_level} from slides not marked data-no-toc,
         // each linking to the slide it lives on. Reveal the top-right control
         // only if there's at least one entry.
-        const tocRoot = document.querySelector<HTMLElement>('[data-toc-root]');
-        const tocPanel = document.querySelector<HTMLElement>('[data-toc-panel]');
-        const tocToggle = document.querySelector<HTMLButtonElement>('[data-toc-toggle]');
+        const tocRoot = chrome<HTMLElement>('[data-toc-root]');
+        const tocPanel = chrome<HTMLElement>('[data-toc-panel]');
+        const tocToggle = chrome<HTMLButtonElement>('[data-toc-toggle]');
         const closeToc = () => {
           if (tocPanel) tocPanel.hidden = true;
           tocToggle?.setAttribute('aria-expanded', 'false');
@@ -462,9 +475,9 @@ const priv = entry.data.private;
         }
 
         // Actions menu (top-left): print/PDF and fullscreen.
-        const menuRoot = document.querySelector<HTMLElement>('[data-menu-root]');
-        const menuPanel = document.querySelector<HTMLElement>('[data-menu-panel]');
-        const menuToggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+        const menuRoot = chrome<HTMLElement>('[data-menu-root]');
+        const menuPanel = chrome<HTMLElement>('[data-menu-panel]');
+        const menuToggle = chrome<HTMLButtonElement>('[data-menu-toggle]');
         if (menuRoot && menuPanel && menuToggle) {
           const closeMenu = () => {
             menuRoot.classList.remove('is-open');
@@ -574,8 +587,8 @@ const priv = entry.data.private;
         // Zoom / lightbox: enlarge a diagram or image in an overlay. Diagrams get
         // a button inside their (.aas-diagram) box; images are wrapped so the
         // button can sit in the corner. Clicking the media works too.
-        const zoom = document.querySelector<HTMLElement>('[data-zoom]');
-        const zoomStage = document.querySelector<HTMLElement>('[data-zoom-stage]');
+        const zoom = chrome<HTMLElement>('[data-zoom]');
+        const zoomStage = chrome<HTMLElement>('[data-zoom-stage]');
         if (zoom && zoomStage) {
           const zoomLabel = zoom.dataset.zoomLabel || 'Enlarge';
           let zoomOpen = false;
@@ -744,7 +757,7 @@ const priv = entry.data.private;
 
         // Overview grid (press `o`): scaled thumbnails of every slide; click one
         // to jump there. Built lazily and rebuilt when the viewport changes.
-        const ov = document.querySelector<HTMLElement>('[data-ov]');
+        const ov = chrome<HTMLElement>('[data-ov]');
         let ovOpen = false;
         const buildOv = () => {
           if (!ov) return;
