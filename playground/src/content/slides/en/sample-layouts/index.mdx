@@ -799,6 +799,54 @@ async function runAgent(input: string) {
 
 </Slide>
 
+<Slide class="center">
+
+## Math
+
+Math slides — inline · display · split with text
+
+</Slide>
+
+<Slide>
+
+### Math basic
+
+A fence standing alone on its own lines is a centered display block:
+
+$$
+F(n) = \begin{cases}
+0 & n = 0 \\
+1 & n = 1 \\
+F(n-1) + F(n-2) & n > 1
+\end{cases}
+$$
+
+Mid-line it stays inline: the recursive form costs $$O(2^n)$$, the iterative one $$O(n)$$.
+
+</Slide>
+
+<Slide>
+
+### Math left, text right
+
+<div class="aas-split">
+
+$$
+\text{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+$$
+
+<div>
+
+KaTeX runs at build time, so the slide ships plain HTML and no math runtime.
+
+- it draws in `currentColor`, so light/dark needs no extra work
+- a long derivation scrolls inside its own block instead of widening the slide
+
+</div>
+</div>
+
+</Slide>
+
 <Slide toc={false}>
 
 ## This heading is not in the TOC

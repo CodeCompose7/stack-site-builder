@@ -1,12 +1,15 @@
 ---
 import '../styles/global.css';
-// KaTeX's stylesheet, loaded site-wide rather than per-page. An Astro `import`
+// KaTeX's stylesheet, loaded for every page under this layout rather than
+// per-page. An Astro `import`
 // is resolved statically, so a runtime `{hasMath && …}` guard (the trick that
 // keeps the Mermaid loader off pages without diagrams) would not actually keep
 // it out of the bundle. Site-wide is also the cheaper end of the trade: it
 // merges into the one global stylesheet every page already downloads and
 // caches, ~7 kB gzipped, and the font files are only fetched by a browser that
-// has math to draw. See markdown.mjs for the pipeline that produces the markup.
+// has math to draw. DeckView.astro is the one route that bypasses this layout
+// (a deck renders its own <html>), so it repeats the import.
+// See markdown.mjs for the pipeline that produces the markup.
 import 'katex/dist/katex.min.css';
 import { site } from '@aas-data/site';
 import { getRelativeLocaleUrl } from 'astro:i18n';
