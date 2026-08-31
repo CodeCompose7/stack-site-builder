@@ -1,12 +1,14 @@
 // @ts-check
 // The shared Markdown/MDX pipeline for awesome-*-stack sites: heading ids +
-// copy-link anchors, mermaid fences, slide directives, and [[wikilink]]
-// resolution against the site's glossary. Sites get the whole pipeline from
-// the theme integration (index.mjs); `aasMarkdown({ glossary })` is also
-// exported for direct use.
+// copy-link anchors, mermaid fences, slide directives, LaTeX math, and
+// [[wikilink]] resolution against the site's glossary. Sites get the whole
+// pipeline from the theme integration (index.mjs); `aasMarkdown({ glossary })`
+// is also exported for direct use.
 import rehypeExternalLinks from 'rehype-external-links';
+import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
 import remarkDirective from 'remark-directive';
+import remarkMath from 'remark-math';
 
 // Prepend a "#" copy-link anchor to h2/h3/h4 headings (a global click handler
 // in BaseLayout copies the section URL). The "#" count per level is drawn via
@@ -412,25 +414,53 @@ function remarkGlossary({ glossary, locales = ['en', 'ko'], defaultLocale = 'en'
   };
 }
 
+// Math is written with DOUBLE dollars — `$$E = mc^2$$` inline, or a `$$` fence
+// on its own lines for a display block (three or more dollars work the same, so
+// `$$$ … $$$` is a valid fence too, as long as the closing run is at least as
+// long as the opening one). Single `$…$` is deliberately OFF: these are catalog
+// sites full of prices, and "plans start at $8 and go to $20" would otherwise
+// silently turn into math. A site that wants single-dollar math can opt in with
+// `aasMarkdown({ math: { singleDollar: true } })`.
+const MATH_SYNTAX = { singleDollarTextMath: false };
+
+// KaTeX renders at BUILD time (rehype-katex), so pages ship plain HTML + MathML
+// with no client-side math runtime; the stylesheet is pulled in by BaseLayout.
+const KATEX_OPTIONS = {
+  // KaTeX's `strict` mode warns about non-Latin characters inside `\text{…}`,
+  // which for bilingual ko/en content is the normal case, not a mistake
+  // (`\text{처리량}`). Silence just that rule and keep the rest of the warnings.
+  /** @param {string} code */
+  strict: (/** @type {string} */ code) => (code === 'unicodeTextInMathMode' ? 'ignore' : 'warn'),
+};
+
 /**
  * The full markdown config for `defineConfig({ markdown })`.
- * @param {{ glossary: Record<string, any>, locales?: string[], defaultLocale?: string }} opts
+ * @param {{ glossary: Record<string, any>, locales?: string[], defaultLocale?: string,
+ *          math?: { singleDollar?: boolean } }} opts
  *   `glossary` — the site's wikilink targets (pass `{}` for none). `locales` /
  *   `defaultLocale` come from the site's astro.config `i18n` so wikilink locale
  *   detection matches whatever locales the site ships (defaults to en/ko).
+ *   `math.singleDollar` opts into `$…$` inline math (see MATH_SYNTAX).
  */
-export function aasMarkdown({ glossary, locales = ['en', 'ko'], defaultLocale = 'en' }) {
+export function aasMarkdown({ glossary, locales = ['en', 'ko'], defaultLocale = 'en', math = {} }) {
   return {
     remarkPlugins: [
       remarkHeadingIds,
+      // Before remarkMermaid/remarkDirective only for readability — all three
+      // are micromark syntax extensions, so the parser applies them together.
+      [remarkMath, { ...MATH_SYNTAX, singleDollarTextMath: math.singleDollar === true }],
       remarkMermaid,
       remarkDirective,
       remarkSlideDirectives,
       [remarkGlossary, { glossary, locales, defaultLocale }],
     ],
     rehypePlugins: [
+      // rehypeSlug runs first so a heading with math slugs from the SOURCE
+      // (`## $$x^2$$` → "x2"); after KaTeX the heading's text content is the
+      // whole rendered glyph soup and the id would be unusable.
       rehypeSlug,
       rehypeHeadingAnchors,
+      [rehypeKatex, KATEX_OPTIONS],
       rehypeTableScroll,
       [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
     ],
