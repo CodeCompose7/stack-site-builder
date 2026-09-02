@@ -11,6 +11,18 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.26.0] - 2026-09-02
+
+### Added
+
+- **PDF pages carry the deck footer and a page number.** The deck's fixed
+  footer and pager are screen chrome and stay hidden in print — a fixed
+  element would repeat over the content of every page, and the pager would
+  stamp the same "current" number everywhere. The deck script now gives every
+  slide its own print-only bottom line instead: the footer's text (presenter
+  · date) on the left and `n / total` on the right, styled like the screen
+  footer. A deck with no footer configured still gets the page numbers.
+
 ## [1.25.5] - 2026-09-02
 
 ### Fixed
@@ -652,6 +664,7 @@ catalog sites from a thin content-only repository.
 - **Standalone development setup** — a devcontainer and a minimal `playground/`
   consuming site for developing and previewing the theme on its own.
 
+[1.26.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.5...v1.26.0
 [1.25.5]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.4...v1.25.5
 [1.25.4]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.3...v1.25.4
 [1.25.3]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.2...v1.25.3
