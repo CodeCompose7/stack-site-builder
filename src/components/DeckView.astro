@@ -474,6 +474,17 @@ const priv = entry.data.private;
           }
         }
 
+        // Cmd/Ctrl+P bypasses the print button: reveal every step and kick off
+        // the lazy-image loads here too. This handler cannot await, so a very
+        // first Cmd+P may still catch an image mid-flight — the button is the
+        // reliable path — but the loads it starts survive for a reprint.
+        window.addEventListener('beforeprint', () => {
+          slides.forEach((_, i) => revealAllSteps(i));
+          deck
+            .querySelectorAll<HTMLImageElement>('img[loading="lazy"]')
+            .forEach((img) => (img.loading = 'eager'));
+        });
+
         // Actions menu (top-left): print/PDF and fullscreen.
         const menuRoot = chrome<HTMLElement>('[data-menu-root]');
         const menuPanel = chrome<HTMLElement>('[data-menu-panel]');
@@ -491,10 +502,20 @@ const priv = entry.data.private;
           });
           // The drawer stays open until the tab is toggled again — an outside
           // click must not close it (same as the TOC panel).
-          menuPanel.querySelector('[data-action="print"]')?.addEventListener('click', () => {
+          menuPanel.querySelector('[data-action="print"]')?.addEventListener('click', async () => {
             closeMenu();
             // Reveal every step so nothing is hidden in the PDF.
             slides.forEach((_, i) => revealAllSteps(i));
+            // Images on slides never scrolled into view are still lazy-unloaded
+            // and would print as empty placeholder boxes — worse, the unsized
+            // box can inflate and push the rest of the slide off the page. Load
+            // them first, with a time cap so a dead image can't block printing.
+            const lazy = Array.from(deck.querySelectorAll<HTMLImageElement>('img[loading="lazy"]'));
+            lazy.forEach((img) => (img.loading = 'eager'));
+            await Promise.race([
+              Promise.all(lazy.map((img) => img.decode().catch(() => undefined))),
+              new Promise((resolve) => setTimeout(resolve, 5000)),
+            ]);
             window.print();
           });
           menuPanel.querySelector('[data-action="fullscreen"]')?.addEventListener('click', () => {
