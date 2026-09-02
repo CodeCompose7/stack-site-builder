@@ -11,6 +11,20 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.25.5] - 2026-09-02
+
+### Fixed
+
+- **A slide's last line could be sliced off at the bottom of the PDF page.**
+  1.25.4 sized the print page so *width*-relative proportions match a large
+  desktop window, but the vertical axis has the same failure mode: rem-capped
+  text keeps its screen size while viewport-height media (a screenshot capped
+  at `58vh`, say) shrinks with the page, so on a 972px-tall page their sum
+  could exceed the slide and the caption under an image lost its last line.
+  The page is now 24in × 13.5in (2304 × 1296 CSS px) — still 16:9, but taller
+  than the viewports decks are authored in, so every slide gets at least the
+  vertical room it had on screen.
+
 ## [1.25.4] - 2026-09-02
 
 Print/PDF export of a deck now reproduces what the screen shows: images load
@@ -638,6 +652,7 @@ catalog sites from a thin content-only repository.
 - **Standalone development setup** — a devcontainer and a minimal `playground/`
   consuming site for developing and previewing the theme on its own.
 
+[1.25.5]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.4...v1.25.5
 [1.25.4]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.3...v1.25.4
 [1.25.3]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.2...v1.25.3
 [1.25.2]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.1...v1.25.2
