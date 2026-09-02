@@ -11,6 +11,30 @@ content schema, while a consuming site supplies only content, taxonomy data and
 config. Sites track the theme with `pnpm up stack-site-builder`, so each release
 here is a plain version bump they pull in.
 
+## [1.25.4] - 2026-09-02
+
+Print/PDF export of a deck now reproduces what the screen shows: images load
+before the dialog opens, and nothing that fit on screen gets clipped.
+
+### Fixed
+
+- **Lazy images printed as empty boxes.** Slides never scrolled into view had
+  not fetched their `loading="lazy"` images, so the PDF showed blank
+  placeholders — and the unsized box could inflate and push the rest of the
+  slide off the page. The print button now flips every deck image to eager,
+  waits (capped at 5s) for them to decode, then opens the dialog. A
+  `beforeprint` fallback covers Cmd/Ctrl+P: it reveals all steps and starts
+  the image loads, though only the button can await them.
+- **Code blocks clipped at the PDF's right edge.** The print page was the
+  PowerPoint 13.333in × 7.5in; rem-based type (code, `clamp()` caps) does not
+  shrink with the page, so it ate proportionally more width than on the
+  desktop windows slides are authored against, and `overflow: auto` boxes
+  cannot scroll on paper. The page is now 18in × 10.125in (1728 × 972 CSS
+  px) — same 16:9, but big enough that every `clamp()` saturates at its rem
+  cap and the content column hits its 96rem cap (now applied in print too),
+  the same saturated state as a full-size desktop monitor. The PDF reproduces
+  what the author saw; paper printing shrinks to fit.
+
 ## [1.25.3] - 2026-09-01
 
 ### Fixed

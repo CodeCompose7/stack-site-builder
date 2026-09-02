@@ -2350,9 +2350,18 @@ summary {
    a stray extra page, and wide enough that image splits never stack. Enable
    "Background graphics" in the print dialog for themed/image backgrounds. */
 @media print {
-  /* PowerPoint-style 16:9 page (13.333in × 7.5in). */
+  /* A 16:9 page, sized 18in × 10.125in (1728 × 972 CSS px) rather than the
+     PowerPoint 13.333in: rem-based type (code blocks, clamp() caps) does not
+     shrink with the page, so on a smaller page it eats proportionally more
+     width than on the desktop windows slides are authored against — and code
+     that fit on screen came out clipped at the right edge of the PDF. This
+     page is big enough that every clamp() saturates at its rem cap and the
+     content column below hits its 96rem cap — the same saturated state as a
+     full-size desktop monitor, so the PDF reproduces what the author saw.
+     PDF pages are vector; the physical inches are irrelevant on screen and
+     shrink-to-fit when printed on paper. */
   @page {
-    size: 13.333in 7.5in;
+    size: 18in 10.125in;
     margin: 0;
   }
   .aas-deck-body {
@@ -2379,8 +2388,8 @@ summary {
     scroll-snap-type: none;
   }
   .aas-slide {
-    width: 13.333in;
-    height: 7.5in;
+    width: 18in;
+    height: 10.125in;
     overflow: hidden;
     scroll-snap-align: none;
     break-inside: avoid;
@@ -2388,9 +2397,11 @@ summary {
   .aas-slide:not(:last-child) {
     break-after: page;
   }
-  /* Fixed page size, so don't derive the content width from viewport units. */
+  /* Fixed page size, so don't derive the content width from viewport units —
+     but keep the same 96rem cap the screen layout has, so the column is
+     exactly as wide as on a large desktop window, no wider. */
   .aas-slide-inner {
-    max-width: 92%;
+    max-width: min(96rem, 92%);
   }
 }
 
