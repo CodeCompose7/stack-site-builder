@@ -192,6 +192,31 @@ const priv = entry.data.private;
         const btnNext = chrome<HTMLButtonElement>('[data-next]');
         if (elTot) elTot.textContent = String(total);
 
+        // Print-only per-slide footer. The deck's fixed footer and pager are
+        // screen chrome — hidden in print, where a fixed element would repeat
+        // over the content of every page (and the pager would stamp the same
+        // "current" number everywhere). Instead each slide carries its own
+        // line: the footer's text on the left, its page number on the right.
+        {
+          const foot = chrome<HTMLElement>('.aas-deck-footer');
+          const footText = foot
+            ? Array.from(foot.children)
+                .map((c) => c.textContent?.trim() ?? '')
+                .filter((t) => t && t !== '·')
+                .join(' · ')
+            : '';
+          slides.forEach((s, i) => {
+            const meta = document.createElement('div');
+            meta.className = 'aas-slide-print-meta';
+            const left = document.createElement('span');
+            left.textContent = footText;
+            const right = document.createElement('span');
+            right.textContent = `${i + 1} / ${total}`;
+            meta.append(left, right);
+            s.appendChild(meta);
+          });
+        }
+
         // Heavy embeds (interactive demo iframes) jank slide transitions the
         // moment they run — worse once the viewer has interacted with one. So
         // embeds are click-to-run: each iframe starts blank behind a "run"
