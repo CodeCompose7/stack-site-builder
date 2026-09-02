@@ -638,6 +638,10 @@ catalog sites from a thin content-only repository.
 - **Standalone development setup** — a devcontainer and a minimal `playground/`
   consuming site for developing and previewing the theme on its own.
 
+[1.25.4]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.3...v1.25.4
+[1.25.3]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.2...v1.25.3
+[1.25.2]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.1...v1.25.2
+[1.25.1]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.25.0...v1.25.1
 [1.25.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.24.0...v1.25.0
 [1.24.0]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.2...v1.24.0
 [1.23.2]: https://github.com/CodeComposeStudio/stack-site-builder/compare/v1.23.1...v1.23.2
